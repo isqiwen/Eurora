@@ -110,8 +110,9 @@ class ShellCommandFailed(Exception):
 class ShellCommandRunner:
     staticShellInternalErrorReturnCode = -110
 
-    def __init__(self, aCommand, *, aLogResult = True, aLogEachLine = True, aLogger = Logger):
+    def __init__(self, aCommand, *, env = None, aLogResult = True, aLogEachLine = True, aLogger = Logger):
         self.myCommand = aCommand
+        self.myENV = env
         self.myLogResult = aLogResult
         self.myLogEachLine = aLogEachLine
         self.myLogger = aLogger
@@ -122,7 +123,8 @@ class ShellCommandRunner:
         proc = subprocess.Popen(
             self.myCommand if Platform.is_windows() else shlex.split(self.myCommand),
             stdout = subprocess.PIPE, stderr = subprocess.PIPE,
-            shell = Platform.is_windows()
+            shell = Platform.is_windows(),
+            env = self.myENV
         )
 
         if self.myLogResult and self.myLogEachLine:

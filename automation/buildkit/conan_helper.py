@@ -42,7 +42,7 @@ def get_pipenv_conan_info(venv_path):
 
     return conan_path, version
 
-def run_conan_command(command_args, use_shell_command=False):
+def run_conan_command(command_args, use_shell_command=False, check=True):
     """
     Run a Conan command with the configured CONAN_USER_HOME environment variable.
 
@@ -72,9 +72,9 @@ def run_conan_command(command_args, use_shell_command=False):
         command_parts.insert(0, str(conan_path))
 
     if use_shell_command:
-        return run_shell_command(command_parts)
+        return run_shell_command(command_parts, env=env)
     else:
-        return run_command(command_parts)
+        return run_command(command_parts, env=env, check=check)
 
 def update_conan_profile(profile_path, section, key, value):
     """
@@ -220,8 +220,11 @@ def initialize_conan_user_home(conan_user_home, profile_name, cppstd=17, shared=
     Create a custom Conan user home and configure it.
     """
     if Path(conan_user_home).exists():
-        Logger.Info(f"Existing Conan configuration found at {conan_user_home}. Deleting...")
-        clean(conan_user_home)
+        user_input = input("Do you want to delete the existing conan cache? (y/n): ").strip().lower()
+        if user_input == "y":
+            clean(conan_user_home)
+        else:
+            Logger.Info("Using the existing conan cache.")
 
     Logger.Info("Initializing Conan configuration...")
     run_conan_command("conan config home")
