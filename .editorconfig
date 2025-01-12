@@ -1,0 +1,45 @@
+# 指定这是顶级配置文件
+root = true
+
+# 通用设置（适用于所有文件）
+[*]
+indent_style = space               # 使用空格而非制表符进行缩进
+indent_size = 4                    # 缩进级别为 4 个空格
+end_of_line = lf                   # 使用 UNIX 风格的换行符（LF）
+charset = utf-8                    # 使用 UTF-8 编码保存文件
+trim_trailing_whitespace = true    # 自动移除行尾多余的空格
+insert_final_newline = true        # 文件末尾确保有一个空行
+
+# 针对 C++ 文件的特殊设置
+[*.cpp]
+indent_style = space               # C++ 文件中使用空格进行缩进
+indent_size = 4                    # 缩进为 4 个空格
+max_line_length = 120              # 每行最大长度设置为 120 个字符，超出后需要换行
+
+[*.h]
+indent_style = space               # 头文件也使用空格进行缩进
+indent_size = 4                    # 缩进为 4 个空格
+
+# 针对特定文件夹的设置
+[cmake/*.txt]
+indent_style = tab                 # CMake 文件使用制表符缩进
+indent_size = 4                    # 缩进级别为 4 个字符
+
+# 针对 Markdown 文档的设置
+[*.md]
+trim_trailing_whitespace = false   # Markdown 文档不移除行尾空格（保持格式）
+insert_final_newline = true
+
+# 针对 JSON 文件的配置
+[*.json]
+indent_style = space               # 缩进使用空格
+indent_size = 4                    # 缩进宽度为 4
+insert_final_newline = true
+trim_trailing_whitespace = false
+
+# 针对 Shell 脚本的配置
+[*.sh]
+indent_style = space               # 缩进使用空格
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true

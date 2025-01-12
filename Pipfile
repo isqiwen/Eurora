@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+requests = "==2.23.0"
+six = "==1.15.0"
+urllib3 = "==1.25.9"
+virtualenv = "==20.0.21"
+
+[packages]
+conan = "*"
+
+[requires]
+python_version = "3.7"

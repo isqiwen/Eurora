@@ -1,0 +1,94 @@
+# CMake build files
+/CMakeCache.txt
+/CMakeFiles/
+/CMakeScripts/
+/Makefile
+/build/
+*.cmake
+
+# VS and Visual Studio Code
+.vscode/
+.vs/
+*.user
+*.userosscache
+*.suo
+*.sln
+*.swp
+
+# Linux and macOS
+.DS_Store
+Thumbs.db
+
+# Build directories (common)
+build/
+out/
+build_windows_release/
+build_windows_debug/
+build_linux_release/
+build_linux_debug/
+
+# Compiled object files, static libraries, and executables
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+*.out
+*.app
+*.pdb
+
+# Debug/Release directories
+*/Debug/
+*/Release/
+*/RelWithDebInfo/
+*/MinSizeRel/
+CMakeUserPresets.json
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# IDE-specific files (e.g., Xcode, JetBrains, etc.)
+.idea/
+*.iml
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+**/__pycache__/
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyz
+*.pyz.sha256
+
+# Install logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environment
+*.venv
+*.virtualenv
+.venv/
+.virtualenv/
+pyvenv.cfg
+
+# pyenv
+.python-version
+
+# pytest
+.cache/
