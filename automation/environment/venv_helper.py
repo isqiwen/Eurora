@@ -72,7 +72,7 @@ def get_pipenv_venv():
     """
     Check if the virtual environment already exists.
     """
-    success, venv_path, _ = run_command(["pipenv", "--venv"])
+    success, venv_path, _ = run_command(["pipenv", "--venv"], check=False)
     return success, venv_path
 
 def delete_virtualenv(target_root):

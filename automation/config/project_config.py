@@ -43,7 +43,7 @@ class ProjectConfig:
         if cls._initialized:
             return
 
-        build_config_path = cls.PROJECT_ROOT / "config" / "build" / "build_config.json"
+        build_config_path = cls.PROJECT_ROOT / "config" / "project_config.json"
 
         if not build_config_path.exists() or not build_config_path.is_file():
             raise FileNotFoundError(f"Configuration file not found: {build_config_path}")
