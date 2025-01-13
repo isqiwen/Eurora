@@ -58,7 +58,7 @@ __pycache__/              # Compiled Python modules
 
 # Ignore build directories for C++/CMake projects
 build/
-**/build/                  # Nested build directories
+**/build/                 # Nested build directories
 
 # Ignore environment configuration files
 .env                      # Python environment variables
