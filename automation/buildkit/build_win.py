@@ -4,7 +4,6 @@ import sys
 from automation.config.project_config import ProjectConfig
 from automation.utils.logger import Logger
 from automation.utils.file_utils import clean
-from automation.utils.shell_utils import run_shell_command
 from automation.buildkit.conan_helper import run_conan_command
 from automation.buildkit.builder_base import StepBase, BuilderBase
 from automation.buildkit.cmake_helper import get_cpp_cmake_gen_target, get_cmake_path, run_cmake_command
@@ -47,8 +46,8 @@ class StepBuild(StepBase):
         # if not build_root.exists():
         #     build_root.mkdir(parents=True)
 
-        run_conan_command(f"conan install {ProjectConfig.PROJECT_ROOT} --build=missing -s build_type={version}", use_shell_command=True)
-        run_conan_command(f"conan build {ProjectConfig.PROJECT_ROOT}", use_shell_command=True)
+        run_conan_command(f"conan install {ProjectConfig.PROJECT_ROOT} --build=missing -s build_type={version}")
+        run_conan_command(f"conan build {ProjectConfig.PROJECT_ROOT}")
         # run_shell_command(f"pipenv run conan install {ProjectConfig.PROJECT_ROOT} --build=missing -s build_type={version}")
         # run_shell_command(f"pipenv run cmake --preset {preset}")
         # run_shell_command(f"pipenv run cmake --build --preset {preset}")

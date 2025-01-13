@@ -7,7 +7,7 @@ from pathlib import Path
 from automation.config.project_config import ProjectConfig
 from automation.utils.logger import Logger
 from automation.utils.platform_utils import Platform
-from automation.utils.shell_utils import run_command, run_shell_command
+from automation.utils.shell_utils import run_command
 from automation.utils.logger import Logger
 
 
@@ -108,7 +108,7 @@ def run_cmake_command(command_args):
 
     command_parts = ' '.join(command_parts)
     Logger.Info(f"Running CMake command: {command_parts}")
-    run_shell_command(command_parts)
+    run_command(command_parts)
 
 def get_cpp_cmake_gen_target():
     """

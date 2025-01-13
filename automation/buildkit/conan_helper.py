@@ -4,7 +4,7 @@ from pathlib import Path
 
 from automation.config.project_config import ProjectConfig
 from automation.utils.logger import Logger
-from automation.utils.shell_utils import run_command, run_shell_command
+from automation.utils.shell_utils import run_command
 from automation.utils.file_utils import clean
 from automation.utils.platform_utils import Platform
 from automation.environment.venv_helper import get_pipenv_venv, run_pipenv_python_command
@@ -42,7 +42,7 @@ def get_pipenv_conan_info(venv_path):
 
     return conan_path, version
 
-def run_conan_command(command_args, use_shell_command=False, check=True):
+def run_conan_command(command_args, *, check=True):
     """
     Run a Conan command with the configured CONAN_USER_HOME environment variable.
 
@@ -71,10 +71,7 @@ def run_conan_command(command_args, use_shell_command=False, check=True):
     else:
         command_parts.insert(0, str(conan_path))
 
-    if use_shell_command:
-        return run_shell_command(command_parts, env=env)
-    else:
-        return run_command(command_parts, env=env, check=check)
+    return run_command(command_parts, env=env, check=check)
 
 def update_conan_profile(profile_path, section, key, value):
     """

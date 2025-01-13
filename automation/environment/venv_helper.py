@@ -145,7 +145,7 @@ def create_virtualenv(python_version, pypi_source):
     Logger.Info("Upgrading pip in virtualenv...")
     run_command(["pipenv", "install", "-i", pypi_source], env=env)
 
-def run_pipenv_python_command(command : str | list, check = True, shell = False):
+def run_pipenv_python_command(command : str | list, *, check=True):
     env = os.environ.copy()
     env["PIPENV_VENV_IN_PROJECT"] = "TRUE"
     env["PIPENV_MAX_DEPTH"] = "10"
@@ -171,4 +171,4 @@ def run_pipenv_python_command(command : str | list, check = True, shell = False)
 
     Logger.Info(f"Run: {' '.join(command_parts)}")
 
-    return run_command(command_parts, check=check, shell=shell, env=env)
+    return run_command(command_parts, check=check, env=env)

@@ -31,7 +31,7 @@ def setup_python_env(env_root, pypi_source="https://pypi.tuna.tsinghua.edu.cn/si
     work_dir_backup = os.getcwd()
 
     if not env_root.is_dir():
-        raise EnvironmentSetupError(f"Environment root {env_root} does not exist or is not a directory.")
+        raise EnvironmentSetupError(f"Pyhon environment root {env_root} does not exist or is not a directory.")
 
     os.chdir(env_root)
 
@@ -48,7 +48,7 @@ def setup_python_env(env_root, pypi_source="https://pypi.tuna.tsinghua.edu.cn/si
         venv_exist, venv_path = get_pipenv_venv()
 
         if venv_exist:
-            Logger.Info(f"Virtual environment already exists in {venv_path}.")
+            Logger.Info(f"Python virtual environment already exists in {venv_path}.")
             user_input = input("Do you want to delete the existing virtual environment? (y/n): ").strip().lower()
             if user_input == "y":
                 delete_virtualenv(env_root)
@@ -64,11 +64,12 @@ def setup_python_env(env_root, pypi_source="https://pypi.tuna.tsinghua.edu.cn/si
         Logger.Error(f"Environment setup error: {e}")
         sys.exit(2)  # Exit with a specific status code for setup errors
     except Exception as e:
-        Logger.Error("\nFailed initializing virtual environment.")
+        Logger.Error("Failed initializing python virtual environment.")
         Logger.Error(f"Error: {e}")
         sys.exit(1)
     finally:
         os.chdir(work_dir_backup)
+        Logger.Info("Finished initializing python virtual environment.")
 
 def setup_env(env_root, pypi_source):
     Logger.Info("Setup the development environment.")

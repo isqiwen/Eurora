@@ -1,56 +1,15 @@
 import subprocess
+import asyncio
 import sys
 import shlex
 import threading
+from pathlib import Path
+import os
+
+automation_package_location = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(automation_package_location))
 
 from automation.utils.logger import Logger
-from automation.utils.platform_utils import Platform
-
-
-def run_command(command, check=True, shell=False, env=None):
-    """
-    Run a system command and handle errors, compatible with Windows and Linux.
-
-    Args:
-        command (list or str): Command to run (list for POSIX, str for Windows).
-        check (bool): If True, raise exception on non-zero return code.
-        shell (bool): If True, run command through the shell.
-        env (dict): Custom environment variables.
-
-    Returns:
-        tuple: (success, stdout, stderr) where success is a boolean indicating command success.
-    """
-
-    if not isinstance(command, str) and not isinstance(command, list):
-        return False, "", f"Command format is invalid: {command}"
-
-    command = [str(c) for c in command]
-
-    try:
-        result = subprocess.run(
-            command,
-            check=check,
-            shell=shell,
-            env=env,
-            text=True,
-            capture_output=True
-        )
-        return result.returncode == 0, result.stdout.strip(), result.stderr.strip()
-    except subprocess.CalledProcessError as e:
-        if not check:
-            # Return False if check is disabled
-            return False, e.stdout.strip(), e.stderr.strip()
-        else:
-            # Print error and terminate if check is enabled
-            Logger.Error(f"Error: Command '{command}' failed with exit code {e.returncode}.")
-            Logger.Error(f"Standard Output:\n{e.stdout}")
-            Logger.Error(f"Error Output:\n{e.stderr}")
-            sys.exit(e.returncode)
-    except FileNotFoundError:
-        # Handle case where the command is not found
-        Logger.Error(f"Error: Command not found: {command}")
-        return False, "", f"Command not found: {command}"
-
 
 
 class DecodeFailed(Exception):
@@ -67,10 +26,10 @@ class Decoder:
             try:
                 return bytes.decode(encoding)
             except UnicodeDecodeError as err:
-                Logger.Debug("Decoder: {}".format(err))
+                pass
 
-        Logger.Error("Decoder: {}".format(bytes))
-        Logger.Error("Decoder: Decoding failed, supported coding : {}".format(cls.static_supported_encodings))
+        Logger.Error(f"Decoder: {bytes}")
+        Logger.Error(f"Decoder: Decoding failed, supported coding : {cls.static_supported_encodings}")
         raise DecodeFailed()
 
 
@@ -87,68 +46,128 @@ class StringBuffer:
         self.myData += data
 
 
-class SubprocessLogReader:
+class SubprocessLogReaderAsync:
+    """
+    Reads lines asynchronously from a subprocess stream, decodes them, and logs or buffers the output.
+    """
 
-    def __init__(self, aLogSource, aLogStringBuffer, aLogMethod, *, aLogEachLine = True):
-        self.myLogSource        = aLogSource
-        self.myLogStringBuffer  = aLogStringBuffer
-        self.myLineLogger       = aLogMethod if     aLogEachLine else lambda aMessage: None
-        self.myPassageLogger    = aLogMethod if not aLogEachLine else lambda aMessage: None
+    def __init__(self, stream, string_buffer, log_method, log_each_line=True):
+        """
+        Initialize the log reader.
 
-    def __call__(self):
-        for lineBytes in iter(self.myLogSource.readline, b''):
-            line = Decoder.Decode(lineBytes).rstrip()
-            self.myLogStringBuffer.Append(line + '\n')
-            self.myLineLogger(line)
-        self.myPassageLogger(self.myLogStringBuffer.data)
+        Args:
+            stream (asyncio.StreamReader): The stream to read from.
+            string_buffer (StringBuffer): A buffer to accumulate all lines read.
+            log_method (callable): A logging method (e.g., logging.info or logging.error).
+            log_each_line (bool): Whether to log each line or only at the end.
+        """
+        self.stream = stream
+        self.string_buffer = string_buffer
+        self.line_logger = log_method if log_each_line else lambda _: None
+        self.passage_logger = log_method if not log_each_line else lambda _: None
+
+    async def __call__(self):
+        """
+        Start reading lines asynchronously from the stream.
+
+        This function appends decoded lines to the buffer and logs them based on the settings.
+        """
+        async for line_bytes in self.stream:
+            line = Decoder.Decode(line_bytes).rstrip()
+            self.string_buffer.Append(line + '\n')
+            self.line_logger(line)
+        # Log the complete passage if `log_each_line` is False
+        self.passage_logger(self.string_buffer.data)
 
 
-class ShellCommandFailed(Exception):
-    pass
+async def run_command_async(command, *, check=False, env=None, log_each_line=True, log_stdout=Logger.Info, log_stderr=Logger.Error, **kwargs):
+    """
+    Run a shell command asynchronously.
 
+    Args:
+        command (str or list): Command to run. String for Windows, list for Linux/Unix.
+        check (bool): Whether to raise an exception if the process exits with a non-zero code.
+        env (dict or None): A dictionary of environment variables to pass to the subprocess.
+            - If `None` (default), the subprocess inherits the current process's environment variables.
+        log_stdout (callable): Optional function to log stdout lines (e.g., print or a logger).
+        log_stderr (callable): Optional function to log stderr lines (e.g., print or a logger).
+        **kwargs: Additional keyword arguments for create_subprocess_exec.
 
-class ShellCommandRunner:
-    staticShellInternalErrorReturnCode = -110
+    Returns:
+        tuple: (exit_code, stdout, stderr) where:
+            - exit_code: Process exit code.
+            - stdout: Captured stdout as a single string.
+            - stderr: Captured stderr as a single string.
 
-    def __init__(self, aCommand, *, env = None, aLogResult = True, aLogEachLine = True, aLogger = Logger):
-        self.myCommand = aCommand
-        self.myENV = env
-        self.myLogResult = aLogResult
-        self.myLogEachLine = aLogEachLine
-        self.myLogger = aLogger
+    Raises:
+        ShellCommandError: If `check` is True and the process exits with a non-zero code.
+    """
+    if isinstance(command, str):
+        command = shlex.split(command)
+    elif not isinstance(command, list):
+        raise ValueError("Command must be a string or a list.")
 
-    def Run(self):
-        self.myLogger.Info('Shell: executing shell command : {0}'.format(self.myCommand))
+    Logger.Info(f'Shell: executing shell command : {command}')
 
-        proc = subprocess.Popen(
-            self.myCommand if Platform.is_windows() else shlex.split(self.myCommand),
-            stdout = subprocess.PIPE, stderr = subprocess.PIPE,
-            shell = Platform.is_windows(),
-            env = self.myENV
+    # Merge environment variables
+    final_env = os.environ.copy()
+    if env:
+        final_env.update(env)
+
+    try:
+        process = await asyncio.create_subprocess_exec(
+            *command,
+            env=final_env,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            **kwargs
         )
+    except Exception as e:
+        Logger.Error(f"Failed to start process: {e}")
+        raise
 
-        if self.myLogResult and self.myLogEachLine:
-            outBuffer, errBuffer = StringBuffer(), StringBuffer()
+    stdout_buffer = StringBuffer()
+    stderr_buffer = StringBuffer()
 
-            threads = [
-                threading.Thread(target = SubprocessLogReader(proc.stdout, outBuffer, self.myLogger.Info)),
-                threading.Thread(target = SubprocessLogReader(proc.stderr, errBuffer, self.myLogger.Error))
-            ]
-            [th.start() for th in threads]
-            [th.join()  for th in threads]
+    stdout_reader = SubprocessLogReaderAsync(
+        process.stdout,
+        stdout_buffer,
+        log_method=log_stdout,
+        log_each_line=log_each_line
+    )
 
-            stdout, stderr = proc.communicate()
-            stdout, stderr = Decoder.Decode(stdout), Decoder.Decode(stderr)
-            stdout, stderr = outBuffer.data + stdout, errBuffer.data + stderr
+    stderr_reader = SubprocessLogReaderAsync(
+        process.stderr,
+        stderr_buffer,
+        log_method=log_stderr,
+        log_each_line=log_each_line
+    )
+
+    try:
+        await asyncio.gather(stdout_reader(), stderr_reader())
+        return_code = await process.wait()
+        stdout, stderr = stdout_buffer.data.rstrip(), stderr_buffer.data.rstrip()
+
+        if not log_each_line:
+            len(stdout) > 0 and log_stdout(stdout)
+            len(stderr) > 0 and log_stdout(stderr)
+
+        if check and return_code != 0:
+            raise RuntimeError(f"Command {command} failed with return code {return_code}")
         else:
-            stdout, stderr = proc.communicate()
-
-            if self.myLogResult:
-                len(stdout) > 0 and self.myLogger.Info(stdout)
-                len(stderr) > 0 and self.myLogger.Error(stderr)
-
-        return proc.returncode == 0, stdout, stderr
+            return process.returncode == 0, stdout, stderr
+    except Exception as e:
+        Logger.Error(f"Error while running command: {e}")
+        raise
 
 
-def run_shell_command(*args, **kwargs):
-    return ShellCommandRunner(*args, **kwargs).Run()
+def run_command(*args, **kwargs):
+    return asyncio.run(run_command_async(*args, **kwargs))
+
+
+if __name__ == "__main__":
+    command = "cmake --version"
+    try:
+        return_code, stdout, stderr = run_command(command, check=True)
+    except Exception as e:
+        Logger.Error(f"Command failed: {e}")
