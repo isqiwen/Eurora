@@ -11,12 +11,13 @@
 #include <spdlog/async.h>
 #include <spdlog/logger.h>
 #include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/bundled/printf.h>
+#include <fmt/printf.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/sinks/msvc_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 #include "common/pattern/Singleton.hpp"
 
@@ -58,7 +59,7 @@ namespace eurora::common {
     private:
         Logger(token) {}
 
-        ~Logger() { shutDown(); }
+        ~Logger() { shutdown(); }
 
     public:
         bool init(std::string_view logFilePath) {
@@ -80,7 +81,7 @@ namespace eurora::common {
                 // initialize spdlog
                 constexpr std::size_t logBufferSize = 32 * 1024; // 32Kb
                 constexpr std::size_t maxFileSize = 50 * 1024 * 1024; // 50M
-                constexpr std::size_t maxNumberOfFiles = 100
+                constexpr std::size_t maxNumberOfFiles = 100;
                 spdlog::init_thread_pool(logBufferSize, 1);
                 std::vector<spdlog::sink_ptr> sinks;
                 // auto dailySink = std::make_shared<spdlog::sinks::daily_file_sink_mt>(logPath.string(), 0, 2);
@@ -124,12 +125,11 @@ namespace eurora::common {
             spdlog::log(loc, lvl, fmt::sprintf(fmt, args...).c_str());
         }
 
-        spdlog::level::level_enum level() { return _log_level; }
+        spdlog::level::level_enum level() { return mLogLevel; }
 
         void setLevel(spdlog::level::level_enum lvl) {
             mLogLevel = lvl;
             spdlog::set_level(lvl);
-
         }
 
         void setFlushOn(spdlog::level::level_enum lvl) { spdlog::flush_on(lvl); }
@@ -152,7 +152,7 @@ namespace eurora::common {
     class LoggerNone final : public Singleton<LoggerNone> {
         friend class Singleton<LoggerNone>;
     private:
-        LoggerNone(token) = {}
+        LoggerNone(token) {}
 
         ~LoggerNone() = default;
 

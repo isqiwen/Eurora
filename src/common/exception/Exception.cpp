@@ -1,7 +1,6 @@
-#include "eurora/common/exception/Exception.h"
+#include "common/exception/Exception.h"
 
 #include <sstream>
-
 
 namespace eurora::common {
 

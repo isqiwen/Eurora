@@ -106,3 +106,5 @@ class EuroraConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["eurora"]
+        if self.settings.compiler == "Visual Studio":
+            self.cpp_info.cxxflags.append("/Zc:__cplusplus")

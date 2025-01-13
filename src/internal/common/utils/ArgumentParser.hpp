@@ -9,10 +9,9 @@
 #include <type_traits>
 #include <iostream>
 #include <stdexcept>
-#include <variant>
+#include <typeindex>
 
 #include "common/exception/Exception.h"
-
 
 namespace eurora::common {
 
@@ -31,15 +30,10 @@ namespace eurora::common {
     template <typename T>
     inline constexpr bool is_valid_argument_type_v = is_valid_argument_type<T>::value;
 
-    class HelpRequestedException : public std::exception {
-    public:
-        const char* what() const noexcept override {
-            return "Help requested";
-        }
-    };
-
     class ArgumentParser {
     public:
+        using ArgumentValue = std::variant<std::monostate, bool, int, float, double, std::string>;
+
         void addFlag(const std::string& name, const std::string& description);
 
         template <typename T>
@@ -71,10 +65,8 @@ namespace eurora::common {
     private:
         enum class Source { None, DefaultValue, CommandLine, ConfigFile };
 
-        using ArgumentValue = std::variant<std::monostate, bool, int, float, double, std::string>;
-
         struct Argument {
-            std::type_index             mType;
+            std::type_index             mType = typeid(void);
             std::string                 mDescription;
             bool                        mRequired = false;
             bool                        mIsFlag = true;

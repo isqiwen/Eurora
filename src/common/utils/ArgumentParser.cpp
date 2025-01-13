@@ -1,4 +1,4 @@
-#include "ArgumentParser.hpp"
+#include "common/utils/ArgumentParser.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -8,7 +8,7 @@
 #include <nlohmann/json.hpp>
 
 #include "common/logger/Logger.hpp"
-
+#include "common/utils/StringUtils.h"
 
 namespace eurora::common {
 
@@ -33,7 +33,7 @@ namespace eurora::common {
 
         for (int i = 0; i < argv.size(); ++i) {
             std::string arg = argv[i];
-            if (arg.starts_with("--")) {
+            if (StringUtils::StartsWith(arg, "--")) {
                 std::string argKey = arg.substr(2);
                 if (mArguments.count(argKey)) {
                     auto& argument = mArguments[argKey];
@@ -45,9 +45,9 @@ namespace eurora::common {
 
                         if (argument.mType == typeid(int)) {
                             argument.mValue = std::stoi(argv[i]);
-                        } else if (argument.type == typeid(std::string)) {
+                        } else if (argument.mType == typeid(std::string)) {
                             argument.mValue = argv[i];
-                        } else if (argument.type == typeid(double)) {
+                        } else if (argument.mType == typeid(double)) {
                             argument.mValue = std::stod(argv[i]);
                         } else if (argument.mType == typeid(bool)) {
                             argument.mValue = (argv[i] == "true" || argv[i] == "True" || argv[i] == "TRUE" || argv[i] == "1");
@@ -57,7 +57,7 @@ namespace eurora::common {
                             EURORA_THROW_EXCEPTION(ErrorCode::InvalidArgument, "Argument : " + argKey + " is not valid type!");
                         }
 
-                        argument.source = Source::CommandLine;
+                        argument.mSource = Source::CommandLine;
                     }
                 }
             }
@@ -78,9 +78,9 @@ namespace eurora::common {
                 if (argument.mConfigAllowed && argument.mSource != Source::CommandLine) {
                     if (argument.mType == typeid(int)) {
                         argument.mValue = value.get<int>();
-                    } else if (argument.type == typeid(std::string)) {
+                    } else if (argument.mType == typeid(std::string)) {
                         argument.mValue = value.get<std::string>();
-                    } else if (argument.type == typeid(double)) {
+                    } else if (argument.mType == typeid(double)) {
                         argument.mValue = value.get<double>();
                     } else if (argument.mType == typeid(bool)) {
                         argument.mValue = value.get<bool>();
@@ -105,7 +105,7 @@ namespace eurora::common {
     }
 
     void ArgumentParser::addHelpFlagKey(const std::string& helpFlagKey) {
-        if (helpFlagKey.starts_with("-")) {
+        if (StringUtils::StartsWith(helpFlagKey, "-")) {
             mHelpFlagKeys.push_back(helpFlagKey);
         } else {
             if (helpFlagKey.length() > 1) {
@@ -146,7 +146,7 @@ namespace eurora::common {
 
                     info << "]";
 
-                    STREAM_INFO() << info.c_str();
+                    STREAM_INFO() << info.str();
                 }
             }
 
@@ -182,7 +182,7 @@ namespace eurora::common {
                 info << std::get<std::string>(arg.mValue);
             }
 
-            STREAM_INFO() << info.c_str();
+            STREAM_INFO() << info.str();
         }
     }
 

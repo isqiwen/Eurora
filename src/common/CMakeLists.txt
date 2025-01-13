@@ -2,21 +2,38 @@
 
 set(LIBRARY_NAME "Common")
 
-set(SRC_SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/exception/Exception.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/exception/ErrorCodes.cpp
+file(GLOB_RECURSE exception_files
+    ${CMAKE_SOURCE_DIR}/src/common/exception/*
+    ${CMAKE_SOURCE_DIR}/src/internal/common/exception/*
 )
 
-add_library(${LIBRARY_NAME} ${SRC_SOURCE})
-
-# Add include directories for building and installing anagram
-target_include_directories(${LIBRARY_NAME} PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+file(GLOB_RECURSE logger_files
+    ${CMAKE_SOURCE_DIR}/src/internal/common/logger/*
 )
+
+file(GLOB_RECURSE utils_files
+    ${CMAKE_SOURCE_DIR}/src/common/utils/*
+    ${CMAKE_SOURCE_DIR}/src/internal/common/utils/*
+)
+
+source_group("Exception" FILES ${exception_files})
+source_group("Logger" FILES ${logger_files})
+source_group("Utils" FILES ${utils_files})
+
+find_package(nlohmann_json REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(fmt REQUIRED)
+
+add_library(${LIBRARY_NAME} ${exception_files} ${logger_files} ${utils_files})
 
 # add project options
-target_link_libraries(${LIBRARY_NAME} PRIVATE ProjectOptions)
+target_link_libraries(${LIBRARY_NAME}
+    PRIVATE
+        ProjectOptions
+        nlohmann_json::nlohmann_json
+        spdlog::spdlog_header_only
+        fmt::fmt
+)
 
 # Include module for GNU standard installation directories
 include(GNUInstallDirs)

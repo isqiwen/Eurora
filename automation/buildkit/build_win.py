@@ -16,14 +16,7 @@ class StepClean(StepBase):
 
         Logger.Info("Builder: @@@ Cleaning @@@")
 
-        if self.config.debug:
-            version = 'Debug'
-        else:
-            version = 'Release'
-
-        build_root = ProjectConfig.BUILD_DIR / version
-
-        clean(build_root)
+        clean(ProjectConfig.BUILD_DIR)
 
 
 class StepBuild(StepBase):

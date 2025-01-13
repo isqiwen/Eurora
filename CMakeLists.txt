@@ -1,14 +1,5 @@
 cmake_minimum_required(VERSION 3.27.0)
 
-# Check the compiler version
-include(cmake/DetectCompiler.cmake)
-
-# Set global C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Create Eurora project
 project(
     Eurora
     VERSION 0.1
@@ -17,20 +8,33 @@ project(
     LANGUAGES CXX
 )
 
-# Set standard project settings
-include(cmake/StandardProjectSettings.cmake)
+#
+# Set project options
+#
 
-# set project options
+include(cmake/StandardSettings.cmake)
+include(cmake/StaticAnalyzers.cmake)
+include(cmake/Utils.cmake)
+
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+    message(FATAL_ERROR "In-source builds are not allowed. Use a separate build directory.")
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+print_project_configuration()
+
 include(cmake/ProjectOptions.cmake)
-
-# set static analysers
-#include(cmake/StaticAnalysers.cmake)
-
-# Add the src directory to the build
 add_subdirectory(src)
 
-# Enable CTest
-#enable_testing()
+# if(${PROJECT_NAME}_ENABLE_UNIT_TESTING)
+#     add_subdirectory(test)
+# endif()
 
-# Add the test subdirectory to the build
-#add_subdirectory(test)
+if(${PROJECT_NAME}_ENABLE_DOXYGEN)
+    include(cmake/Doxygen.cmake)
+    setup_doxygen()
+endif()
