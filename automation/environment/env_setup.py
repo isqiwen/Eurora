@@ -59,7 +59,7 @@ def setup_python_env(env_root, pypi_source="https://pypi.tuna.tsinghua.edu.cn/si
             create_virtualenv(python_version, pypi_source)
 
         if get_virtualenv_python_info(venv_path) == None:
-            Logger.Error(f"Cann't detect python in {venv_path}.")
+            Logger.Error(f"Cannot detect python in {venv_path}.")
     except EnvironmentSetupError as e:
         Logger.Error(f"Environment setup error: {e}")
         sys.exit(2)  # Exit with a specific status code for setup errors

@@ -41,9 +41,9 @@ BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakConstructorInitializersBeforeComma: false
 BreakStringLiterals: true
-ColumnLimit: 0
+ColumnLimit: 150
 CommentPragmas: '^ IWYU pragma:'
-CompactNamespaces: false
+CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 2
@@ -65,12 +65,11 @@ IncludeCategories:
   Regex: .*
 IncludeIsMainRegex: (Test)?$
 IndentCaseLabels: false
-IndentWidth: 2
+IndentWidth: 4
 IndentWrappedFunctionNames: true
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: true
-Language: Cpp
 MacroBlockBegin: ''
 MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 2
@@ -94,5 +93,5 @@ SpacesInContainerLiterals: true
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: Cpp11
-TabWidth: 2
+TabWidth: 4
 UseTab: Never

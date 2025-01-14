@@ -6,7 +6,6 @@ from automation.utils.logger import Logger
 from automation.utils.file_utils import clean
 from automation.buildkit.conan_helper import run_conan_command
 from automation.buildkit.builder_base import StepBase, BuilderBase
-from automation.buildkit.cmake_helper import get_cpp_cmake_gen_target, get_cmake_path, run_cmake_command
 
 
 class StepClean(StepBase):

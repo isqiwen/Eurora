@@ -1,5 +1,3 @@
-# Create anagram library
-
 set(LIBRARY_NAME "Common")
 
 file(GLOB_RECURSE exception_files

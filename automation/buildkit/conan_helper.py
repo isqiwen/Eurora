@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 from pathlib import Path
 
 from automation.config.project_config import ProjectConfig
@@ -7,40 +8,8 @@ from automation.utils.logger import Logger
 from automation.utils.shell_utils import run_command
 from automation.utils.file_utils import clean
 from automation.utils.platform_utils import Platform
-from automation.environment.venv_helper import get_pipenv_venv, run_pipenv_python_command
+from automation.environment.venv_helper import get_pipenv_venv, run_pipenv_python_command, get_executable_path
 
-
-def get_pipenv_conan_info(venv_path):
-    venv_path = Path(venv_path).resolve()
-
-    if not venv_path.exists() or not venv_path.is_dir():
-        Logger.Error(f"Error: The path '{venv_path}' does not exist or is not a directory.")
-        return None
-
-    # Check typical locations for the Python interpreter
-    conan_candidates = [
-        venv_path / "bin" / "conan",  # Unix-like systems
-        venv_path / "Scripts" / "conan.exe"  # Windows
-    ]
-
-    conan_path = ""
-
-    for p in conan_candidates:
-        if p.exists() and p.is_file():
-            conan_path = p
-            break
-
-    if conan_path == "":
-        Logger.Info(f"No conan found in virtual environment: {venv_path}")
-        return None
-
-    _, version, _ = run_command([str(conan_path), "--version"])
-    version = version.split()[2]
-
-    Logger.Info(f"Detect conan found in virtual environment: {venv_path}")
-    Logger.Info(f"Detect conan version: {version}")
-
-    return conan_path, version
 
 def run_conan_command(command_args, *, check=True):
     """
@@ -56,15 +25,17 @@ def run_conan_command(command_args, *, check=True):
 
     if isinstance(command_args, str):
         # Split string into list for processing
-        command_parts = command_args.split()
+        command_parts = shlex.split(command_args)
     elif isinstance(command_args, list):
         # Use the list directly
         command_parts = command_args[:]
     else:
         raise TypeError("Command args must be a string or a list.")
 
-    _, venv_path = get_pipenv_venv()
-    conan_path, _ = get_pipenv_conan_info(venv_path)
+    conan_path = get_executable_path("conan")
+
+    if conan_path == None:
+        raise FileNotFoundError("conan was not found.")
 
     if Path(command_parts[0]).stem.lower() == "conan":
         command_parts[0] = str(conan_path)

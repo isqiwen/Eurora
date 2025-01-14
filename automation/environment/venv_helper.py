@@ -1,5 +1,6 @@
 import os
 import sys
+import shlex
 from pathlib import Path
 
 from automation.utils.shell_utils import run_command
@@ -10,6 +11,36 @@ from automation.utils.file_utils import clean
 class EnvironmentSetupError(Exception):
     """Custom exception for environment setup errors."""
     pass
+
+def get_executable_path(executable_name):
+    success, venv_path = get_pipenv_venv()
+    venv_path = Path(venv_path)
+
+    if not success:
+        Logger.Error(f"Cannot detect pipenv environment in {os.get_cwd()}")
+        return None
+
+    executable_name = Path(executable_name).stem
+
+    candidates = [
+        venv_path / "bin" / executable_name, # Unix-like systems
+        venv_path / "Scripts" / (executable_name + ".exe") # Windows
+    ]
+
+    executable_path = None
+
+    for p in candidates:
+        if p.exists() and p.is_file():
+            executable_path = p
+            break
+
+    if executable_path == None:
+        Logger.Error(f"No {executable_name} interpreter found in virtual environment: {venv_path}")
+        return None
+
+    Logger.Info(f"Detect {executable_name} in virtual environment: {venv_path}")
+
+    return executable_path
 
 def get_python_info():
     """
@@ -37,33 +68,14 @@ def get_virtualenv_python_info(venv_path):
         str: Full path to the Python interpreter in the virtual environment.
         None: If no valid Python interpreter is found.
     """
-    venv_path = Path(venv_path).resolve()
 
-    if not venv_path.exists() or not venv_path.is_dir():
-        Logger.Error(f"Error: The path '{venv_path}' does not exist or is not a directory.")
-        return None
+    python_path = get_executable_path("python")
 
-    # Check typical locations for the Python interpreter
-    python_candidates = [
-        venv_path / "bin" / "python",  # Unix-like systems
-        venv_path / "bin" / "python3", # Unix-like systems
-        venv_path / "Scripts" / "python.exe"  # Windows
-    ]
-
-    python_path = ""
-
-    for p in python_candidates:
-        if p.exists() and p.is_file():
-            python_path = p
-            break
-
-    if python_path == "":
-        Logger.Info(f"No Python interpreter found in virtual environment: {venv_path}")
-        return None
+    if python_path == None:
+        raise FileNotFoundError("python was not found.")
 
     _, version_output, _ = run_command([str(python_path), "--version"])
 
-    Logger.Info(f"Detect Python interpreter found in virtual environment: {venv_path}")
     Logger.Info(f"Detect Python version: {version_output}")
 
     return python_path, version_output
@@ -129,21 +141,23 @@ def create_virtualenv(python_version, pypi_source):
     env["PIPENV_VENV_IN_PROJECT"] = "TRUE"
     env["PIPENV_MAX_DEPTH"] = "10"
 
-    # Upgrade pip
     Logger.Info("Upgrading pip...")
     run_command(["python", "-m", "pip", "install", "--upgrade", "pip", "-i", pypi_source], env=env)
 
-    # Install pipenv
     Logger.Info("Installing pipenv...")
     run_command(["python", "-m", "pip", "install", "pipenv", "-i", pypi_source], env=env)
 
-    # Initialize virtual environment
     Logger.Info("Initializing virtualenv...")
     run_command(["pipenv", "--python", python_version], env=env)
 
-    # Upgrade pip in the virtual environment
     Logger.Info("Upgrading pip in virtualenv...")
     run_command(["pipenv", "install", "-i", pypi_source], env=env)
+
+    Logger.Info("Installing cmake in virtualenv...")
+    run_command(["pipenv", "install", "cmake", "-i", pypi_source], env=env)
+
+    Logger.Info("Installing clang-format in virtualenv...")
+    run_command(["pipenv", "install", "clang-format", "-i", pypi_source], env=env)
 
     Logger.Info("Installing clang-tidy in virtualenv...")
     run_command(["pipenv", "install", "clang-tidy", "-i", pypi_source], env=env)
@@ -155,15 +169,17 @@ def run_pipenv_python_command(command : str | list, *, check=True):
 
     if isinstance(command, str):
         # Split string into list for processing
-        command_parts = command.split()
+        command_parts = shlex.split(command)
     elif isinstance(command, list):
         # Use the list directly
         command_parts = command[:]
     else:
         raise TypeError("Command must be a string or a list.")
 
-    _, venv_path = get_pipenv_venv()
-    python_path, _ = get_virtualenv_python_info(venv_path)
+    python_path = get_executable_path("python")
+
+    if python_path == None:
+        raise FileNotFoundError("python was not found.")
 
     # Replace 'python' with the specified python_path if it's the first element
     if Path(command_parts[0]).stem == "python" or Path(command_parts[0]).stem == "python3":
