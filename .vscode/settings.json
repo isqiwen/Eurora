@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "_ENABLE_ASAN",
+        "AIAS",
         "BINDIR",
         "buildkit",
         "CLANGTIDY",
@@ -19,6 +20,7 @@
         "LPWSTR",
         "Miscelanious",
         "NOMINMAX",
+        "RTBS",
         "STREQUAL",
         "suppr",
         "Vcpkg",

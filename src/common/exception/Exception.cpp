@@ -1,47 +1,39 @@
-#include "common/exception/Exception.h"
+#include "common/exception/exception.h"
 
 #include <sstream>
 
 namespace eurora::common {
 
-std::string trimFilePath(const std::string &filePath)
-{
-    size_t pos = filePath.find_last_of("/\\");
-    return (pos == std::string::npos) ? filePath : filePath.substr(pos + 1);
+std::string TrifilePath(const std::string& filePath) {
+  size_t pos = filePath.find_last_of("/\\");
+  return (pos == std::string::npos) ? filePath : filePath.substr(pos + 1);
 }
 
-Exception::Exception(ErrorCode code, const std::string &description, const std::string &file, int line)
-  : mErrorCode(code), mDescription(description), mFile(trimFilePath(file)), mLine(line)
-{}
+Exception::Exception(ErrorCode code, const std::string& description, const std::string& file, int line)
+    : error_code_(code), description_(description), file_(TrifilePath(file)), line_(line) {}
 
-const char *Exception::what() const noexcept
-{
-    if (mCachedWhat.empty())
-    {
-        std::ostringstream oss;
-        oss << getErrorMessage(mErrorCode);
-        if (!mDescription.empty())
-        {
-            oss << ": " << mDescription;
-        }
-        if (!mFile.empty())
-        {
-            oss << " (in " << mFile << ":" << mLine << ")";
-        }
-        mCachedWhat = oss.str();
+const char* Exception::what() const noexcept {
+  if (cached_what_.empty()) {
+    std::ostringstream oss;
+    oss << GetErrorMessage(error_code_);
+    if (!description_.empty()) {
+      oss << ": " << description_;
     }
+    if (!file_.empty()) {
+      oss << " (in " << file_ << ":" << line_ << ")";
+    }
+    cached_what_ = oss.str();
+  }
 
-    return mCachedWhat.c_str();
+  return cached_what_.c_str();
 }
 
-ErrorCode Exception::code() const noexcept
-{
-    return mErrorCode;
+ErrorCode Exception::error_code() const noexcept {
+  return error_code_;
 }
 
-const std::string &Exception::description() const noexcept
-{
-    return mDescription;
+const std::string& Exception::description() const noexcept {
+  return description_;
 }
 
 }  // namespace eurora::common

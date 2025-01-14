@@ -1,7 +1,6 @@
 import subprocess
 import asyncio
 import sys
-import shlex
 import threading
 from pathlib import Path
 import os
@@ -103,7 +102,7 @@ async def run_command_async(command, *, check=False, env=None, log_each_line=Tru
         ShellCommandError: If `check` is True and the process exits with a non-zero code.
     """
     if isinstance(command, str):
-        command = shlex.split(command)
+        command = command.split()
     elif not isinstance(command, list):
         raise ValueError("Command must be a string or a list.")
 

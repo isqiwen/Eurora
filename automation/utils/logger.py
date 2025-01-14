@@ -67,8 +67,8 @@ class LoggerSingleton:
         LoggerSingleton().logger.critical(message, *args, **kwargs)
 
     @staticmethod
-    def SetLevel(level):
-        LoggerSingleton().logger.setLevel(level)
+    def set_level(level):
+        LoggerSingleton().logger.set_level(level)
 
 
 # Global logger instance

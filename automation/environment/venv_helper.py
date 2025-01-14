@@ -1,6 +1,5 @@
 import os
 import sys
-import shlex
 from pathlib import Path
 
 from automation.utils.shell_utils import run_command
@@ -169,7 +168,7 @@ def run_pipenv_python_command(command : str | list, *, check=True):
 
     if isinstance(command, str):
         # Split string into list for processing
-        command_parts = shlex.split(command)
+        command_parts = command.split()
     elif isinstance(command, list):
         # Use the list directly
         command_parts = command[:]

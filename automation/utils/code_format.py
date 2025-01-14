@@ -1,6 +1,5 @@
 import os
 import sys
-import shlex
 import argparse
 from pathlib import Path
 
@@ -18,7 +17,7 @@ def run_clang_format_command(command_args, *, check=True):
     """
     if isinstance(command_args, str):
         # Split string into list for processing
-        command_parts = shlex.split(command_args)
+        command_parts = command_args.split()
     elif isinstance(command_args, list):
         # Use the list directly
         command_parts = command_args[:]

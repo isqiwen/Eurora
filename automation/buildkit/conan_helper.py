@@ -1,6 +1,5 @@
 import os
 import re
-import shlex
 from pathlib import Path
 
 from automation.config.project_config import ProjectConfig
@@ -24,8 +23,7 @@ def run_conan_command(command_args, *, check=True):
     Logger.Info(f"Conan user home set to: {ProjectConfig.CONAN_USER_HOME}")
 
     if isinstance(command_args, str):
-        # Split string into list for processing
-        command_parts = shlex.split(command_args)
+        command_parts = command_args.split()
     elif isinstance(command_args, list):
         # Use the list directly
         command_parts = command_args[:]

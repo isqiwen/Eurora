@@ -92,6 +92,8 @@ doc/notes.txt
 !CMakeLists.txt
 !.vscode/settings.json
 
+.VSCodeCounter/
+
 # ================================
 # End of File
 # ================================

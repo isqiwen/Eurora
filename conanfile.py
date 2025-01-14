@@ -47,7 +47,7 @@ class EuroraConan(ConanFile):
         "gtest/[>=1.14.0]"
     ]
 
-    def validate(self):
+    def Validate(self):
         check_min_cppstd(self, "17")
 
     def config_options(self):
@@ -87,7 +87,7 @@ class EuroraConan(ConanFile):
     def layout(self):
         cmake_layout(self)
 
-    def validate(self):
+    def Validate(self):
         if self.settings.compiler == "gcc" and self.settings.compiler.version < "9":
             raise ConanInvalidConfiguration("GCC < 9 is not supported.")
 
