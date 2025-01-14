@@ -11,8 +11,8 @@ from automation.config.project_config import ProjectConfig
 
 SUBCOMMANDS = {
     "setup-env": "automation.environment.env_setup",
-    "build-eurora": "automation.buildkit.build_runner",
-    "print-tree": "automation.utils.print_tree"
+    "eurora": "automation.buildkit.build_runner",
+    "tree": "automation.utils.print_tree"
 }
 
 def main():

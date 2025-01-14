@@ -33,7 +33,7 @@ def _create_parser(parent_parser = None):
     if parent_parser is None:
         parser = argparse.ArgumentParser(description=description)
     else:
-        parser = parent_parser.add_parser("print-tree", description=description, help=description)
+        parser = parent_parser.add_parser("tree", description=description, help=description)
 
     parser.add_argument(
         "path",

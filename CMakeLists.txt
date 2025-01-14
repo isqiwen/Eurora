@@ -28,6 +28,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 print_project_configuration()
 
 include(cmake/ProjectOptions.cmake)
+
+
 add_subdirectory(src)
 
 # if(${PROJECT_NAME}_ENABLE_UNIT_TESTING)

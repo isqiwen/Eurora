@@ -145,6 +145,9 @@ def create_virtualenv(python_version, pypi_source):
     Logger.Info("Upgrading pip in virtualenv...")
     run_command(["pipenv", "install", "-i", pypi_source], env=env)
 
+    Logger.Info("Installing clang-tidy in virtualenv...")
+    run_command(["pipenv", "install", "clang-tidy", "-i", pypi_source], env=env)
+
 def run_pipenv_python_command(command : str | list, *, check=True):
     env = os.environ.copy()
     env["PIPENV_VENV_IN_PROJECT"] = "TRUE"

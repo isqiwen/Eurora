@@ -2,6 +2,7 @@
     "cSpell.words": [
         "_ENABLE_ASAN",
         "BINDIR",
+        "buildkit",
         "CLANGTIDY",
         "conanbuildinfo",
         "cplusplus",

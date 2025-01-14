@@ -6,25 +6,29 @@ automation_package_location = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(automation_package_location))
 
 from automation.config.project_config import ProjectConfig
-from automation.buildkit.conan_helper import get_pipenv_conan_info, get_pipenv_venv
-from automation.buildkit.build_win import WinBuilder
+from automation.buildkit.build_eurora import EuroraBuilder
 
 
 def run(config):
-    _, venv_path = get_pipenv_venv()
-    get_pipenv_conan_info(venv_path)
-
-    builder = WinBuilder()
-    builder.setup_and_run(config)
+    eurora_builder = EuroraBuilder()
+    eurora_builder.setup_and_run(config)
 
 def _create_parser(parent_parser = None):
-    description = "Build Eurora."
+    description = "Eurora."
     if parent_parser is None:
         parser = argparse.ArgumentParser(description=description)
     else:
-        parser = parent_parser.add_parser("build-eurora", description=description, help=description)
+        parser = parent_parser.add_parser("eurora", description=description, help=description)
 
     workflow = parser.add_argument_group('workflow')
+
+    workflow.add_argument(
+        "--install-dp",
+        dest = 'install_dp',
+        help = f'Install {ProjectConfig.PROJECT_NAME} dependencies',
+        default = False,
+        action = 'store_true'
+    )
 
     workflow.add_argument(
         "--clean",
