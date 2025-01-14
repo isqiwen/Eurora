@@ -17,7 +17,7 @@ foreach(file ${test_sources})
     target_link_libraries(
       ${test_name}_ut
       PUBLIC
-        Common
+        Eurora::common
         GTest::GTest
         GTest::Main
     )

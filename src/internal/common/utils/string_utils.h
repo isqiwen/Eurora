@@ -15,6 +15,6 @@ public:
   static bool StartsWith(const std::string& source_str, const std::string& prefix);
 };
 
-}  // namespace eurora::common
+} // namespace eurora::common
 
 #endif  // EURORA_COMMON_UTILS_STRING_UTILS_H_

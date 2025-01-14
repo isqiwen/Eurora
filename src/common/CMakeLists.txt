@@ -1,4 +1,4 @@
-set(LIBRARY_NAME "Common")
+set(LIBRARY_NAME "libcommon")
 
 file(GLOB_RECURSE exception_files
   ${CMAKE_SOURCE_DIR}/src/common/exception/*
@@ -21,16 +21,24 @@ source_group("Utils" FILES ${utils_files})
 find_package(nlohmann_json REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)
+find_package(Boost REQUIRED)
 
 add_library(${LIBRARY_NAME} ${exception_files} ${logger_files} ${utils_files})
+add_library(Eurora::common ALIAS libcommon)
 
 # add project options
 target_link_libraries(${LIBRARY_NAME}
   PUBLIC
     ProjectOptions
-    nlohmann_json::nlohmann_json
     spdlog::spdlog_header_only
     fmt::fmt
+)
+
+target_link_libraries(${LIBRARY_NAME}
+  PRIVATE
+    Boost::headers
+    Boost::nowide
+    nlohmann_json::nlohmann_json
 )
 
 target_compile_definitions(${LIBRARY_NAME} PUBLIC LOGGER_LEVEL=0)

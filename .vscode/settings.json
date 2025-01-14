@@ -21,6 +21,7 @@
         "INLINES_",
         "Interprocedural",
         "IWYU",
+        "libcommon",
         "LPWSTR",
         "Miscelanious",
         "NOMINMAX",

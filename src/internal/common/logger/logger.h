@@ -56,9 +56,9 @@
 #endif
 
 #if (LOGGER_LEVEL <= LOG_LEVEL_ERROR)
-#define LOG_ERROR(fmt, ...) eurora::common::Logger::Instance().Log({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::error, fmt, ##__VA_ARGS__);
-#define PRINT_ERROR(fmt, ...) eurora::common::Logger::Instance().Printf({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::error, fmt, ##__VA_ARGS__);
-#define STREAM_ERROR() eurora::common::Logger::LogStream({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::error, "")
+#define LOG_ERROR(fmt, ...) eurora::common::Logger::Instance().Log({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::err, fmt, ##__VA_ARGS__);
+#define PRINT_ERROR(fmt, ...) eurora::common::Logger::Instance().Printf({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::err, fmt, ##__VA_ARGS__);
+#define STREAM_ERROR() eurora::common::Logger::LogStream({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::err, "")
 #else
 #define LOG_ERROR(fmt, ...)
 #define PRINT_ERROR(fmt, ...)
