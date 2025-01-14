@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include "common/pattern/Singleton.hpp"
+#include "common/utils/time_utils.h"
 
 /// spdlog wrap class
 
@@ -50,7 +51,7 @@ private:
   ~Logger() { Shutdown(); }
 
 public:
-  bool Init(std::string_view log_filePath) {
+  bool Init(std::string_view log_file_path) {
     namespace fs = std::filesystem;
 
     if (initialized_) {
@@ -59,12 +60,30 @@ public:
 
     try {
       // check log path and try to create log directory
-      fs::path log_path(log_filePath);
+      fs::path log_path(log_file_path);
       fs::path log_dir = log_path.parent_path();
+      std::string base_name = log_path.stem().string();
+      std::string extension = log_path.extension().string();
 
-      if (!fs::exists(log_path)) {
+      if (!fs::exists(log_dir)) {
         fs::create_directories(log_dir);
       }
+
+      // Generate a unique log file name for the same day
+      auto now = std::chrono::system_clock::now();
+      std::time_t t = std::chrono::system_clock::to_time_t(now);
+      std::tm local_tm = *std::localtime(&t);
+
+      std::string date_str = common::TimeUtils::GetCurrentDateString();
+
+      int count = 0;
+      fs::path unique_log_file;
+      do {
+        std::stringstream ss;
+        ss << base_name << "_" << date_str << (count >= 0 ? "_" + std::to_string(count) : "") << extension;
+        unique_log_file = log_dir / ss.str();
+        count++;
+      } while (fs::exists(unique_log_file));
 
       // initialize spdlog
       constexpr std::size_t log_buffer_size = 32 * 1024;       // 32Kb
@@ -72,11 +91,8 @@ public:
       constexpr std::size_t max_number_of_files = 100;
       spdlog::init_thread_pool(log_buffer_size, 1);
       std::vector<spdlog::sink_ptr> sinks;
-      // auto dailySink =
-      // std::make_shared<spdlog::sinks::daily_file_sink_mt>(log_path.string(),
-      // 0, 2); sinks.push_back(dailySink);
 
-      auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(log_path.string(), max_file_size, max_number_of_files);
+      auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(unique_log_file.string(), max_file_size, max_number_of_files);
       sinks.push_back(file_sink);
 
 #if defined(_DEBUG) && defined(_WIN32) && !defined(NO_CONSOLE_LOG)
@@ -93,7 +109,8 @@ public:
       spdlog::set_pattern("%s(%#): [%L %D %T.%e %P %t %!] %v");
       spdlog::flush_on(spdlog::level::warn);
       spdlog::set_level(log_level_);
-    } catch (std::exception_ptr e) {
+    } catch (const std::exception& e) {
+      spdlog::error("Failed to initialize logger: {}", e.what());
       assert(false);
       return false;
     }
@@ -116,9 +133,9 @@ public:
 
   spdlog::level::level_enum level() { return log_level_; }
 
-  void set_level(spdlog::level::level_enum lvl) {
-    log_level_ = lvl;
-    spdlog::set_level(lvl);
+  void set_level(unsigned lvl) {
+    log_level_ = static_cast<spdlog::level::level_enum>(lvl);
+    spdlog::set_level(log_level_);
   }
 
   void SetFlushOn(spdlog::level::level_enum lvl) { spdlog::flush_on(lvl); }

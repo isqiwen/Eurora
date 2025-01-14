@@ -1,17 +1,17 @@
 set(LIBRARY_NAME "Common")
 
 file(GLOB_RECURSE exception_files
-    ${CMAKE_SOURCE_DIR}/src/common/exception/*
-    ${CMAKE_SOURCE_DIR}/src/internal/common/exception/*
+  ${CMAKE_SOURCE_DIR}/src/common/exception/*
+  ${CMAKE_SOURCE_DIR}/src/internal/common/exception/*
 )
 
 file(GLOB_RECURSE logger_files
-    ${CMAKE_SOURCE_DIR}/src/internal/common/logger/*
+  ${CMAKE_SOURCE_DIR}/src/internal/common/logger/*
 )
 
 file(GLOB_RECURSE utils_files
-    ${CMAKE_SOURCE_DIR}/src/common/utils/*
-    ${CMAKE_SOURCE_DIR}/src/internal/common/utils/*
+  ${CMAKE_SOURCE_DIR}/src/common/utils/*
+  ${CMAKE_SOURCE_DIR}/src/internal/common/utils/*
 )
 
 source_group("Exception" FILES ${exception_files})
@@ -26,25 +26,27 @@ add_library(${LIBRARY_NAME} ${exception_files} ${logger_files} ${utils_files})
 
 # add project options
 target_link_libraries(${LIBRARY_NAME}
-    PRIVATE
-        ProjectOptions
-        nlohmann_json::nlohmann_json
-        spdlog::spdlog_header_only
-        fmt::fmt
+  PUBLIC
+    ProjectOptions
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog_header_only
+    fmt::fmt
 )
+
+target_compile_definitions(${LIBRARY_NAME} PUBLIC LOGGER_LEVEL=0)
 
 # Include module for GNU standard installation directories
 include(GNUInstallDirs)
 
 # Install library and executable and export as a set
 install(TARGETS
-    ${LIBRARY_NAME}
-    EXPORT ${LIBRARY_NAME}ExportSet
+  ${LIBRARY_NAME}
+  EXPORT ${LIBRARY_NAME}ExportSet
 )
 
 # Install the export set
 install(EXPORT ${LIBRARY_NAME}ExportSet
-    FILE ${LIBRARY_NAME}Targets.cmake
-    NAMESPACE ${LIBRARY_NAME}::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${LIBRARY_NAME}
+  FILE ${LIBRARY_NAME}Targets.cmake
+  NAMESPACE ${LIBRARY_NAME}::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${LIBRARY_NAME}
 )

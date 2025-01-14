@@ -6,7 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "common/logger/logger.hpp"
+#include "common/logger/logger.h"
 #include "common/utils/string_utils.h"
 
 namespace eurora::common {
