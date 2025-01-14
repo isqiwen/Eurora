@@ -68,7 +68,6 @@ def format_code(path, style="file", recursive=False):
 def _format_file(file_path, style):
     """Helper function to format a single file using clang-format."""
     try:
-        file_path = str(file_path).replace("\\", "\\\\")
         Logger.Info(f"Formatting: {file_path}")
         run_clang_format_command(f"clang-format -i {file_path} --style={style}")
     except Exception as e:
