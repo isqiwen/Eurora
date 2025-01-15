@@ -8,18 +8,18 @@ namespace eurora::common {
 template <typename T>
 class Singleton {
 public:
-  static T& Instance() {
-    static T instance{Token{}};
-    return instance;
-  }
+    static T& Instance() {
+        static T instance{Token{}};
+        return instance;
+    }
 
-  Singleton(const Singleton&)           = delete;
-  Singleton& operator=(const Singleton) = delete;
+    Singleton(const Singleton&)           = delete;
+    Singleton& operator=(const Singleton) = delete;
 
 protected:
-  struct Token {};
+    struct Token {};
 
-  Singleton() {}
+    Singleton() {}
 };
 
 }  // namespace eurora::common

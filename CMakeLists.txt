@@ -24,14 +24,8 @@ include(cmake/ProjectOptions.cmake)
 
 print_project_configuration()
 
-include(ExternalProject)
-ExternalProject_Add(
-    ismrmrd
-    GIT_REPOSITORY https://github.com/ismrmrd/ismrmrd.git
-    GIT_TAG v1.14.2
-    PREFIX ismrmrd
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/ismrmrd
-)
+include(cmake/ThirdParty/ISMRMRD.cmake)
+
 add_subdirectory(src)
 
 if(${PROJECT_NAME}_ENABLE_UNIT_TESTING)

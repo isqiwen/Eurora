@@ -4,7 +4,7 @@ root = true
 # 通用设置（适用于所有文件）
 [*]
 indent_style = space
-indent_size = 2
+indent_size = 4
 end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
@@ -13,17 +13,17 @@ insert_final_newline = true
 # 针对 C++ 文件的特殊设置
 [*.cpp]
 indent_style = space
-indent_size = 2
+indent_size = 4
 max_line_length = 160
 
 [*.h]
 indent_style = space
-indent_size = 2
+indent_size = 4
 
 # 针对特定文件夹的设置
 [cmake/*.txt]
 indent_style = tab
-indent_size = 2
+indent_size = 4
 
 # 针对 Markdown 文档的设置
 [*.md]
@@ -33,13 +33,13 @@ insert_final_newline = true
 # 针对 JSON 文件的配置
 [*.json]
 indent_style = space
-indent_size = 2
+indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = false
 
 # 针对 Shell 脚本的配置
 [*.sh]
 indent_style = space
-indent_size = 2
+indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true

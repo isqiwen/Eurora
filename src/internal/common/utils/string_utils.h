@@ -12,7 +12,7 @@ namespace eurora::common {
 
 class StringUtils {
 public:
-  static bool StartsWith(const std::string& source_str, const std::string& prefix);
+    static bool StartsWith(const std::string& source_str, const std::string& prefix);
 };
 
 }  // namespace eurora::common

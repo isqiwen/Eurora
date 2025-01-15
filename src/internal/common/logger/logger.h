@@ -17,9 +17,9 @@
 #define LOG_FATAL(fmt, ...) LOG(spdlog::level::critical, fmt, ##__VA_ARGS__)
 
 #define LOG_IF(condition, level, fmt, ...) \
-  if (condition) {                         \
-    LOG(level, fmt, ##__VA_ARGS__);        \
-  }
+    if (condition) {                       \
+        LOG(level, fmt, ##__VA_ARGS__);    \
+    }
 
 #define STREAM_TRACE() eurora::common::Logger::LogStream({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::trace, "")
 #define STREAM_DEBUG() eurora::common::Logger::LogStream({__FILENAME__, __LINE__, __FUNCTION__}, spdlog::level::debug, "")
