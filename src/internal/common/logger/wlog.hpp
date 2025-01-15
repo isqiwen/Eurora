@@ -61,7 +61,7 @@ public:
     try {
       // check log path and try to create log directory
       fs::path log_path(log_file_path);
-      fs::path log_dir = log_path.parent_path();
+      fs::path log_dir      = log_path.parent_path();
       std::string base_name = log_path.stem().string();
       std::string extension = log_path.extension().string();
 
@@ -69,11 +69,7 @@ public:
         fs::create_directories(log_dir);
       }
 
-      // Generate a unique log file name for the same day
-      auto now = std::chrono::system_clock::now();
-      std::time_t t = std::chrono::system_clock::to_time_t(now);
-      std::tm local_tm = *std::localtime(&t);
-
+      // Generate a unique log file name for the same dayS
       std::string date_str = common::TimeUtils::GetCurrentDateString();
 
       int count = 0;
@@ -86,8 +82,8 @@ public:
       } while (fs::exists(unique_log_file));
 
       // initialize spdlog
-      constexpr std::size_t log_buffer_size = 32 * 1024;       // 32Kb
-      constexpr std::size_t max_file_size = 50 * 1024 * 1024;  // 50M
+      constexpr std::size_t log_buffer_size     = 32 * 1024;         // 32Kb
+      constexpr std::size_t max_file_size       = 50 * 1024 * 1024;  // 50M
       constexpr std::size_t max_number_of_files = 100;
       spdlog::init_thread_pool(log_buffer_size, 1);
       std::vector<spdlog::sink_ptr> sinks;
@@ -150,7 +146,7 @@ public:
   }
 
 private:
-  std::atomic_bool initialized_ = false;
+  std::atomic_bool initialized_        = false;
   spdlog::level::level_enum log_level_ = spdlog::level::trace;
 };
 

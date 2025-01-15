@@ -62,8 +62,8 @@ private:
   struct Argument {
     std::type_index type_ = typeid(void);
     std::string description_;
-    bool required_ = false;
-    bool is_flag_ = true;
+    bool required_       = false;
+    bool is_flag_        = true;
     bool config_allowed_ = true;
     ArgumentValue value_;
     Source source_ = Source::kNone;

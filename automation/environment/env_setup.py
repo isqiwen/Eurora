@@ -8,6 +8,7 @@ sys.path.insert(0, str(automation_package_location))
 
 from automation.utils.logger import Logger
 from automation.buildkit.conan_setup import conan_setup
+from automation.environment.generate_env import generate_env_file
 from automation.environment.venv_helper import (
     get_python_info,
     get_pipenv_venv,
@@ -31,7 +32,7 @@ def setup_python_env(env_root, pypi_source="https://pypi.tuna.tsinghua.edu.cn/si
     work_dir_backup = os.getcwd()
 
     if not env_root.is_dir():
-        raise EnvironmentSetupError(f"Pyhon environment root {env_root} does not exist or is not a directory.")
+        raise EnvironmentSetupError(f"Python environment root {env_root} does not exist or is not a directory.")
 
     os.chdir(env_root)
 
@@ -75,6 +76,7 @@ def setup_env(env_root, pypi_source):
     Logger.Info("Setup the development environment.")
     setup_python_env(env_root, pypi_source)
     conan_setup()
+    generate_env_file()
 
 def _create_parser(parent_parser = None):
     description="Setup the development environment."

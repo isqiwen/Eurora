@@ -7,9 +7,9 @@
 namespace eurora::common {
 
 std::string TimeUtils::FormatTime(const std::string& format, bool include_ms) {
-  auto now = std::chrono::system_clock::now();
+  auto now             = std::chrono::system_clock::now();
   std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-  auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  auto millisec        = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 
   std::ostringstream ss;
   auto local_now_time = GetLocalTime(now_time);

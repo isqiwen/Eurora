@@ -29,7 +29,7 @@ void ArgumentParser::ParseCommandLine(const std::vector<std::string>& argv) {
       if (arguments_.count(argKey)) {
         auto& argument = arguments_[argKey];
         if (argument.is_flag_) {
-          argument.value_ = true;
+          argument.value_  = true;
           argument.source_ = Source::kCommandLine;
         } else if (i + 1 < argv.size()) {
           i++;
