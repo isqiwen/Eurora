@@ -32,13 +32,13 @@ target_link_libraries(${LIBRARY_NAME}
     ProjectOptions
     spdlog::spdlog_header_only
     fmt::fmt
+    nlohmann_json::nlohmann_json
 )
 
 target_link_libraries(${LIBRARY_NAME}
   PRIVATE
     Boost::headers
     Boost::nowide
-    nlohmann_json::nlohmann_json
 )
 
 target_compile_definitions(${LIBRARY_NAME} PUBLIC LOGGER_LEVEL=0)

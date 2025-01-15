@@ -3,8 +3,7 @@
 #include "common/logger/logger.h"
 
 TEST(Test_Log, Test_Log_Initialize) {
-  eurora::common::Logger::Instance().Init("logs/test_log_initialize.log");
-  eurora::common::Logger::Instance().set_level(LOG_LEVEL_INFO);
+  eurora::common::Logger::Instance().InitFromConfig("config/log_config.json");
 
   STREAM_INFO() << "Hello World!";
 }

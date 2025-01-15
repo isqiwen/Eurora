@@ -3,6 +3,11 @@
 
 #pragma once
 
+#include <filesystem>
+#include <memory>
+#include <sstream>
+#include <fstream>
+
 #include <fmt/Printf.h>
 #include <spdlog/async.h>
 #include <spdlog/fmt/fmt.h>
@@ -14,10 +19,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/spdlog.h>
-
-#include <filesystem>
-#include <memory>
-#include <sstream>
+#include <nlohmann/json.hpp>
 
 #include "common/pattern/Singleton.hpp"
 #include "common/utils/time_utils.h"
@@ -51,15 +53,35 @@ private:
   ~Logger() { Shutdown(); }
 
 public:
-  bool Init(std::string_view log_file_path) {
-    namespace fs = std::filesystem;
-
-    if (initialized_) {
-      return true;
-    }
-
+  bool InitFromConfig(const std::string& config_file) {
     try {
+      // Read and parse the configuration file
+      std::ifstream file(config_file);
+      if (!file.is_open()) {
+        throw std::runtime_error("Unable to open log config file: " + config_file);
+      }
+
+      nlohmann::json config;
+      file >> config;
+
+      // Extract configuration
+      std::string log_level_str       = config.value("log_level", "info");
+      std::string log_flush_level_str = config.value("log_flush_level", "warn");
+      bool enable_console_log         = config.value("enable_console_log", true);
+      bool enable_file_log            = config.value("enable_file_log", true);
+      std::string log_file_path       = config.value("log_file_path", "logs/eurora.log");
+      std::string log_pattern         = config.value("log_pattern", "[%Y-%m-%d %H:%M:%S.%e] [%l] [thread %t] %v");
+      size_t max_file_size            = config.value("max_file_size", 50 * 1024 * 1024);  // 50MB
+      size_t max_files                = config.value("max_files", 50);
+      size_t log_buffer_size          = config.value("log_bugger_size", 32 * 1024);  // 32Kb
+      size_t log_thread_pool_size     = config.value("log_thread_pool_size", 1);
+
+      // Set log level and flush level
+      spdlog::level::level_enum log_level   = spdlog::level::from_str(log_level_str);
+      spdlog::level::level_enum flush_level = spdlog::level::from_str(log_flush_level_str);
+
       // check log path and try to create log directory
+      namespace fs = std::filesystem;
       fs::path log_path(log_file_path);
       fs::path log_dir      = log_path.parent_path();
       std::string base_name = log_path.stem().string();
@@ -81,41 +103,48 @@ public:
         count++;
       } while (fs::exists(unique_log_file));
 
-      // initialize spdlog
-      constexpr std::size_t log_buffer_size     = 32 * 1024;         // 32Kb
-      constexpr std::size_t max_file_size       = 50 * 1024 * 1024;  // 50M
-      constexpr std::size_t max_number_of_files = 100;
-      spdlog::init_thread_pool(log_buffer_size, 1);
+      // Create sinks based on the configuration
+      spdlog::init_thread_pool(log_buffer_size, log_thread_pool_size);
       std::vector<spdlog::sink_ptr> sinks;
-
-      auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(unique_log_file.string(), max_file_size, max_number_of_files);
-      sinks.push_back(file_sink);
-
+      if (enable_file_log) {
+        auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(unique_log_file.string(), max_file_size, max_files);
+        sinks.push_back(file_sink);
+      }
+      if (enable_console_log) {
 #if defined(_DEBUG) && defined(_WIN32) && !defined(NO_CONSOLE_LOG)
-      auto ms_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-      sinks.push_back(ms_sink);
+        auto ms_sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
+        sinks.push_back(ms_sink);
 #endif  //  _DEBUG
 
 #if !defined(_WIN32) && !defined(NO_CONSOLE_LOG)
-      auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-      sinks.push_back(console_sink);
+        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        sinks.push_back(console_sink);
 #endif
-      spdlog::set_default_logger(std::make_shared<spdlog::logger>("", sinks.begin(), sinks.end()));
+      }
 
-      spdlog::set_pattern("%s(%#): [%L %D %T.%e %P %t %!] %v");
-      spdlog::flush_on(spdlog::level::warn);
-      spdlog::set_level(log_level_);
+      // Initialize logger with sinks
+      auto logger = std::make_shared<spdlog::logger>("", sinks.begin(), sinks.end());
+      spdlog::set_default_logger(logger);
+
+      // Apply settings
+      spdlog::set_level(log_level);
+      spdlog::flush_on(flush_level);
+      spdlog::set_pattern(log_pattern);
+
+      spdlog::info("Logger initialized successfully with configuration from {}", config_file);
     } catch (const std::exception& e) {
-      spdlog::error("Failed to initialize logger: {}", e.what());
-      assert(false);
+      spdlog::error("Failed to initialize logger from config: {}", e.what());
       return false;
     }
-    initialized_ = true;
 
+    initialized_ = true;
     return true;
   }
 
-  void Shutdown() { spdlog::shutdown(); }
+  void Shutdown() {
+    spdlog::shutdown();
+    initialized_ = false;
+  }
 
   template <typename... Args>
   void Log(const spdlog::source_loc& loc, spdlog::level::level_enum lvl, const char* fmt, const Args&... args) {
@@ -148,17 +177,6 @@ public:
 private:
   std::atomic_bool initialized_        = false;
   spdlog::level::level_enum log_level_ = spdlog::level::trace;
-};
-
-class LoggerNone final : public Singleton<LoggerNone> {
-  friend class Singleton<LoggerNone>;
-
-private:
-  LoggerNone(Token) {}
-
-  ~LoggerNone() = default;
-
-  LoggerNone& operator<<(const char* content) { return *this; }
 };
 
 }  // namespace eurora::common

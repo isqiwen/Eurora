@@ -2,9 +2,10 @@
 
 #include <fstream>
 #include <iomanip>
-#include <nlohmann/json.hpp>
 #include <sstream>
 #include <stdexcept>
+
+#include <nlohmann/json.hpp>
 
 #include "common/logger/logger.h"
 #include "common/utils/string_utils.h"

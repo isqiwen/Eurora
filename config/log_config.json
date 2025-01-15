@@ -1,0 +1,12 @@
+{
+  "log_level": "info",
+  "log_flush_level": "warn",
+  "log_pattern": "[%Y-%m-%d %H:%M:%S.%e] [%l] [thread %t] %v",
+  "enable_console_log": true,
+  "enable_file_log": true,
+  "log_file_path": "logs/eurora.log",
+  "max_file_size": 52428800,
+  "max_files": 50,
+  "log_bugger_size": 32768,
+  "log_thread_pool_size": 1
+}
