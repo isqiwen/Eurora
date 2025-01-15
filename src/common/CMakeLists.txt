@@ -41,8 +41,6 @@ target_link_libraries(${LIBRARY_NAME}
     Boost::nowide
 )
 
-target_compile_definitions(${LIBRARY_NAME} PUBLIC LOGGER_LEVEL=0)
-
 # Include module for GNU standard installation directories
 include(GNUInstallDirs)
 

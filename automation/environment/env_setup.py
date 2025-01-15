@@ -122,4 +122,5 @@ if __name__ == "__main__":
     from automation.config.project_config import ProjectConfig
 
     ProjectConfig.initialize()
-    main()
+    # main()
+    setup_python_env(".")
