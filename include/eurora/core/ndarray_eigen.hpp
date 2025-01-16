@@ -181,11 +181,6 @@ private:
         tensor_ = Eigen::TensorMap<Eigen::Tensor<T, Eigen::Dynamic>>(data_, eigen_dims);
     }
 
-    std::vector<size_t> dimensions_;
-    std::vector<size_t> offset_factors_;
-    size_t size_        = 0;
-    T* data_            = nullptr;
-    bool manage_memory_ = false;
     Eigen::TensorMap<Eigen::Tensor<T, Eigen::Dynamic>> tensor_;
 };
 
