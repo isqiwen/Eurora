@@ -3,13 +3,13 @@ include_guard()
 # Create an interface library for project options
 add_library(ProjectOptions INTERFACE)
 
-set(INTERNAL_SHARED_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/src/internal/")
+set(INTERNAL_SHARED_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/src/")
 set(EXTERNAL_SHARED_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include/")
 
 target_include_directories(ProjectOptions INTERFACE
-  $<BUILD_INTERFACE:${INTERNAL_SHARED_INCLUDE_DIR}>
-  $<BUILD_INTERFACE:${EXTERNAL_SHARED_INCLUDE_DIR}>
-  $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${INTERNAL_SHARED_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${EXTERNAL_SHARED_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>
 )
 
 # Enable compiler flags
@@ -25,13 +25,13 @@ include(GNUInstallDirs)
 
 # Install project options library and export as set
 install(TARGETS
-  ProjectOptions
-  EXPORT ProjectOptionsExportSet
+    ProjectOptions
+    EXPORT ProjectOptionsExportSet
 )
 
 # Install the project options export set
 install(EXPORT ProjectOptionsExportSet
-  FILE ProjectOptionsTargets.cmake
-  NAMESPACE ProjectOptions::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ProjectOptions
+    FILE ProjectOptionsTargets.cmake
+    NAMESPACE ProjectOptions::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ProjectOptions
 )
