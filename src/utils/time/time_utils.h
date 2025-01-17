@@ -6,9 +6,11 @@
 #include <ctime>
 #include <string>
 
+#include "eurora/utils/export_macros.h"
+
 namespace eurora::utils {
 
-class TimeUtils {
+class EURORA_API TimeUtils {
 public:
     static std::string GetCurrentDateTimeStringInMS();
     static std::string GetTimestampString();

@@ -1,4 +1,4 @@
-#include "argument_parser.hpp"
+#include "argument_parser.h"
 
 #include <fstream>
 #include <iomanip>
@@ -7,8 +7,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include "string_utils.h"
-#include "utils/logger/logger.h"
+#include "eurora/utils/logger.h"
+#include "utils/common/string_utils.h"
 
 namespace eurora::utils {
 

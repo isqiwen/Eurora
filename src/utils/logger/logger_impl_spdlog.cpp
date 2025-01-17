@@ -1,14 +1,33 @@
-#include "wlog.hpp"
+#include "logger_impl_spdlog.h"
+
+#include <filesystem>
+#include <fstream>
+#include <sstream>
+
+#include <fmt/Printf.h>
+
+#include <spdlog/async.h>
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/logger.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/daily_file_sink.h>
+#include <spdlog/sinks/msvc_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/stdout_sinks.h>
 
 #include <nlohmann/json.hpp>
 
+#include "utils/time/time_utils.h"
+
 namespace eurora::utils {
 
-bool Logger::InitFromConfig(const std::string& config_file) {
+LoggerImplSpdlog::InitFromConfig(const std::string& config_file) {
     try {
         // Read and parse the configuration file
         std::ifstream file(config_file);
         if (!file.is_open()) {
+            initialized_ = false;
             throw std::runtime_error("Unable to open log config file: " + config_file);
         }
 
@@ -48,9 +67,7 @@ bool Logger::InitFromConfig(const std::string& config_file) {
         int count = 0;
         fs::path unique_log_file;
         do {
-            std::stringstream ss;
-            ss << base_name << "_" << date_str << (count >= 0 ? "_" + std::to_string(count) : "") << extension;
-            unique_log_file = log_dir / ss.str();
+            unique_log_file = log_dir / fmt::format("{}_{}_{}{}", base_name, date_str, count, extension);
             count++;
         } while (fs::exists(unique_log_file));
 
@@ -74,31 +91,96 @@ bool Logger::InitFromConfig(const std::string& config_file) {
         }
 
         // Initialize logger with sinks
-        auto logger = std::make_shared<spdlog::logger>("", sinks.begin(), sinks.end());
-        spdlog::set_default_logger(logger);
+        logger_ = std::make_shared<spdlog::logger>("", sinks.begin(), sinks.end());
+        spdlog::set_default_logger(logger_);
 
         // Apply settings
+        logger_->set_level(log_level);
         spdlog::set_pattern(log_pattern);
-        SetLevel(static_cast<unsigned>(log_level));
-        FlushOn(flush_level);
+        spdlog::flush_on(flush_level);
 
         spdlog::info("Logger initialized successfully with configuration from {}", config_file);
     } catch (const std::exception& e) {
         spdlog::error("Failed to initialize logger from config: {}", e.what());
+        initialized_ = false;
         return false;
     }
 
     initialized_ = true;
+
     return true;
 }
 
-static const char* Logger::GetShortname(std::string_view path) {
-    if (path.empty()) {
-        return path.data();
+void LoggerImplSpdlog::Log(const char* file, int line, const char* function, LogLevel level, const std::string& message) {
+    if (!initialized_) {
+        throw std::runtime_error("SpdLogger is not initialized.");
     }
+    spdlog::source_loc loc{file, line, function};
+    logger_->log(loc, ToSpdlogLevel(level), message);
+}
 
-    size_t pos = path.find_last_of("/\\");
-    return path.data() + ((pos == path.npos) ? 0 : pos + 1);
+void LoggerImplSpdlog::Shutdown() {
+    initialized_ = false;
+    spdlog::shutdown();
+}
+
+void LoggerImplSpdlog::SetLevel(LogLevel level) {
+    if (!initialized_) {
+        throw std::runtime_error("Logger is not initialized.");
+    }
+    logger_->set_level(ToSpdlogLevel(level));
+}
+
+LogLevel LoggerImplSpdlog::GetLevel() const {
+    if (!initialized_) {
+        throw std::runtime_error("Logger is not initialized.");
+    }
+    return FromSpdlogLevel(logger_->level());
+}
+
+void LoggerImplSpdlog::FlushOn(LogLevel lvl) {
+    if (!initialized_) {
+        throw std::runtime_error("Logger is not initialized.");
+    }
+    spdlog::flush_on(ToSpdlogLevel(lvl));
+}
+
+spdlog::level::level_enum LoggerImplSpdlog::ToSpdlogLevel(LogLevel level) const {
+    switch (level) {
+        case LogLevel::Trace:
+            return spdlog::level::trace;
+        case LogLevel::Debug:
+            return spdlog::level::debug;
+        case LogLevel::Info:
+            return spdlog::level::info;
+        case LogLevel::Warn:
+            return spdlog::level::warn;
+        case LogLevel::Error:
+            return spdlog::level::err;
+        case LogLevel::Fatal:
+            return spdlog::level::critical;
+        default:
+            return spdlog::level::info;
+    }
+}
+
+LogLevel LoggerImplSpdlog::FromSpdlogLevel(spdlog::level::level_enum level) const {
+    switch (level) {
+        case spdlog::level::trace:
+            return LogLevel::Trace;
+        case spdlog::level::debug:
+            return LogLevel::Debug;
+        case spdlog::level::info:
+            return LogLevel::Info;
+        case spdlog::level::warn:
+            return LogLevel::Warn;
+        case spdlog::level::err:
+            return LogLevel::Error;
+        case spdlog::level::critical:
+            return LogLevel::Fatal;
+        default:
+            return LogLevel::Info;
+    }
 }
 
 }  // namespace eurora::utils

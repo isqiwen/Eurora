@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "eurora/utils/error_codes.h"
+
 namespace eurora::utils {
 
 inline std::string TrimFilePath(const std::string& filePath) {

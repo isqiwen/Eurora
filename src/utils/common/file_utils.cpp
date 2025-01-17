@@ -5,7 +5,7 @@
 
 #include <boost/nowide/utf8_codecvt.hpp>
 
-#include "utils/logger/logger.h"
+#include "eurora/utils/logger.h"
 
 namespace eurora::utils {
 
@@ -22,7 +22,7 @@ std::vector<std::filesystem::path> FileUtils::GetAllFilesInDir(const std::string
             }
         }
     } catch (const std::system_error& e) {
-        LOG_INFO(e.what());
+        STREAM_INFO() << e.what();
     }
 
     return list_of_files;

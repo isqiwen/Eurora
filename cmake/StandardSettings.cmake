@@ -71,6 +71,8 @@ if(BUILD_SHARED_LIBS)
     set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 endif()
 
+add_compile_definitions(EURORA_BUILD_SHARED_LIBS=$<BOOL:${BUILD_SHARED_LIBS}>)
+
 option(${PROJECT_NAME}_ENABLE_LTO "Enable Interprocedural Optimization, aka Link Time Optimization (LTO)." OFF)
 if(${PROJECT_NAME}_ENABLE_LTO)
     include(CheckIPOSupported)
@@ -100,6 +102,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Specify the output directory for libraries
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+add_compile_definitions()
 
 # Generate and install project config
 include(cmake/GenerateAndInstallConfig.cmake)

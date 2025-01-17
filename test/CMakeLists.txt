@@ -16,8 +16,8 @@ if(${CMAKE_PROJECT_NAME}_USE_GTEST)
     find_package(GTest REQUIRED)
     target_link_libraries(${test_name}_ut
         PUBLIC
-            eurora::eurora_utils
-            eurora::eurora_core
+            eurora::time
+            eurora::logger
             GTest::GTest
             GTest::Main
     )
@@ -25,7 +25,8 @@ elseif(${CMAKE_PROJECT_NAME}_USE_CATCH2)
     find_package(Catch2 REQUIRED)
     target_link_libraries(${test_name}_ut
         PUBLIC
-            Common
+            eurora::time
+            eurora::logger
             Catch2::Catch2
     )
 else()

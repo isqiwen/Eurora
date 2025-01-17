@@ -8,13 +8,13 @@
 #include <string>
 #include <vector>
 
-#include "utils/exception/exception.h"
+#include "eurora/utils/exception.h"
 
 namespace eurora::utils {
 
 EURORA_MAKE_SIMPLE_EXCEPTION(FileNotExist);
 
-class FileUtils {
+class EURORA_API FileUtils {
 public:
     static void SetUTF8(std::fstream& input);
 

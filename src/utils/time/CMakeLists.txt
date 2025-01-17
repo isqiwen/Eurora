@@ -1,24 +1,19 @@
-set(LIBRARY_NAME "eurora_utils_log")
+set(LIBRARY_NAME "time")
 
-find_package(nlohmann_json REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(fmt REQUIRED)
-
-add_library(${LIBRARY_NAME} wlog.cpp)
-add_library(eurora::eurora_utils ALIAS ${LIBRARY_NAME})
-
-target_include_directories(${LIBRARY_NAME}
-    PUBLIC
-        $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+file(GLOB_RECURSE src_files
+    ${CMAKE_SOURCE_DIR}/src/utils/time/*.h
+    ${CMAKE_SOURCE_DIR}/src/utils/time/*.hpp
+    ${CMAKE_SOURCE_DIR}/src/utils/time/*.cpp
 )
+
+source_group("src" FILES ${src_files})
+
+add_library(${LIBRARY_NAME} SHARED ${src_files})
+add_library(eurora::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 
 target_link_libraries(${LIBRARY_NAME}
     PUBLIC
         ProjectOptions
-        spdlog::spdlog_header_only
-        fmt::fmt
-        nlohmann_json::nlohmann_json
 )
 
 # Include module for GNU standard installation directories

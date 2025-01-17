@@ -25,7 +25,7 @@ class EuroraConan(ConanFile):
 
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {
-        "shared": False,
+        "shared": True,
         "fPIC": True,
         "spdlog/*:header_only": True,
     }
@@ -49,7 +49,7 @@ class EuroraConan(ConanFile):
     ]
 
     def Validate(self):
-        check_min_cppstd(self, "17")
+        check_min_cppstd(self, "20")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -93,7 +93,9 @@ class EuroraConan(ConanFile):
             raise ConanInvalidConfiguration("GCC < 9 is not supported.")
 
     def generate(self):
-        CMakeToolchain(self).generate()
+        tc = CMakeToolchain(self)
+        tc.variables["BUILD_SHARED_LIBS"] = self.options.shared
+        tc.generate()
         CMakeDeps(self).generate()
 
     def build(self):

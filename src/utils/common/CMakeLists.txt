@@ -1,45 +1,27 @@
-set(LIBRARY_NAME "eurora_utils")
+set(LIBRARY_NAME "common")
+
+file(GLOB_RECURSE common_files
+    ${CMAKE_SOURCE_DIR}/src/utils/common/*.h
+    ${CMAKE_SOURCE_DIR}/src/utils/common/*.hpp
+    ${CMAKE_SOURCE_DIR}/src/utils/common/*.cpp
+)
 
 file(GLOB_RECURSE exception_files
-    ${CMAKE_SOURCE_DIR}/src/utils/exception/*
-)
-
-file(GLOB_RECURSE logger_files
-    ${CMAKE_SOURCE_DIR}/src/utils/logger/*
-)
-
-file(GLOB_RECURSE pattern_files
-    ${CMAKE_SOURCE_DIR}/src/utils/pattern/*
-)
-
-file(GLOB_RECURSE utils_files
-    ${CMAKE_SOURCE_DIR}/src/utils/*
+    ${CMAKE_SOURCE_DIR}/include/eurora/utils/error_codes.h
+    ${CMAKE_SOURCE_DIR}/include/eurora/utils/exception.h
 )
 
 source_group("Exception" FILES ${exception_files})
-source_group("Logger" FILES ${logger_files})
-source_group("Utils" FILES ${utils_files})
-source_group("Pattern" FILES ${pattern_files})
+source_group("Common" FILES ${common_files})
 
-find_package(nlohmann_json REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(fmt REQUIRED)
 find_package(Boost REQUIRED)
 
-add_library(${LIBRARY_NAME} ${exception_files} ${logger_files} ${utils_files} ${pattern_files})
-add_library(eurora::eurora_utils ALIAS ${LIBRARY_NAME})
-
-# add project options
-target_link_libraries(${LIBRARY_NAME}
-    PUBLIC
-        ProjectOptions
-        spdlog::spdlog_header_only
-        fmt::fmt
-        nlohmann_json::nlohmann_json
-)
+add_library(${LIBRARY_NAME} SHARED ${exception_files} ${common_files})
+add_library(eurora::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 
 target_link_libraries(${LIBRARY_NAME}
     PRIVATE
+        ProjectOptions
         Boost::headers
         Boost::nowide
 )
