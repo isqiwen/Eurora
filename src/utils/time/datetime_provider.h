@@ -1,6 +1,3 @@
-#ifndef EURORA_UTILS_TIME_UTILS_H_
-#define EURORA_UTILS_TIME_UTILS_H_
-
 #pragma once
 
 #include <ctime>
@@ -10,7 +7,7 @@
 
 namespace eurora::utils {
 
-class EURORA_API TimeUtils {
+class EURORA_API DatetimeProvider {
 public:
     static std::string GetCurrentDateTimeStringInMS();
     static std::string GetTimestampString();
@@ -24,5 +21,3 @@ private:
 };
 
 }  // namespace eurora::utils
-
-#endif  // EURORA_UTILS_TIME_UTILS_H_

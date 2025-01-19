@@ -1,7 +1,7 @@
-#include "eurora/utils/logger.h"
-
 #include <gtest/gtest.h>
 #include <fstream>
+
+#include "eurora/utils/logger.h"
 
 using namespace eurora::utils;
 
@@ -13,9 +13,9 @@ std::string CreateTempConfig() {
         "log_level": "debug",
         "log_flush_level": "warn",
         "enable_console_log": true,
-        "enable_file_log": false,
+        "enable_file_log": true,
         "log_file_path": "logs/test_log.log",
-        "log_pattern": "[%Y-%m-%d %H:%M:%S.%e] [%l] [thread %t] %v",
+        "log_pattern": "%s(%#): [%l %D %T.%e %t %!] %v",
         "max_file_size": 1048576,
         "max_files": 5,
         "log_buffer_size": 32768,
@@ -56,17 +56,7 @@ TEST_F(LoggerTest, LogWithFormat) {
 
 TEST_F(LoggerTest, StreamLogging) {
     EXPECT_NO_THROW(STREAM_INFO() << "Streamed log message with value: " << 3.14);
-    EXPECT_NO_THROW(STREAM_WARN() << "Another streamed log, value: " << 123);
-}
-
-TEST_F(LoggerTest, GetShortname) {
-    std::string full_path = "/path/to/file.cpp";
-    const char* shortname = Logger::GetShortname(full_path);
-    EXPECT_STREQ(shortname, "file.cpp");
-
-    full_path = "file.cpp";
-    shortname = Logger::GetShortname(full_path);
-    EXPECT_STREQ(shortname, "file.cpp");
+    EXPECT_NO_THROW(STREAM_WARN() << "Another streamed log, value: " << 123 << " " << 0.75);
 }
 
 TEST_F(LoggerTest, SetAndGetLogLevel) {

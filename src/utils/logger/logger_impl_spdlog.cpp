@@ -2,27 +2,24 @@
 
 #include <filesystem>
 #include <fstream>
-#include <sstream>
-
-#include <fmt/Printf.h>
 
 #include <spdlog/async.h>
-#include <spdlog/fmt/fmt.h>
 #include <spdlog/logger.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/daily_file_sink.h>
 #include <spdlog/sinks/msvc_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/stdout_sinks.h>
 
 #include <nlohmann/json.hpp>
 
-#include "utils/time/time_utils.h"
+#include "utils/time/datetime_provider.h"
 
 namespace eurora::utils {
 
-LoggerImplSpdlog::InitFromConfig(const std::string& config_file) {
+bool LoggerImplSpdlog::InitFromConfig(const std::string& config_file) {
+    if (initialized_) {
+        return true;
+    }
+
     try {
         // Read and parse the configuration file
         std::ifstream file(config_file);
@@ -38,9 +35,9 @@ LoggerImplSpdlog::InitFromConfig(const std::string& config_file) {
         std::string log_level_str       = config.value("log_level", "info");
         std::string log_flush_level_str = config.value("log_flush_level", "warn");
         bool enable_console_log         = config.value("enable_console_log", true);
-        bool enable_file_log            = config.value("enable_file_log", true);
+        bool enable_file_log            = config.value("enable_file_log", false);
         std::string log_file_path       = config.value("log_file_path", "logs/eurora.log");
-        std::string log_pattern         = config.value("log_pattern", "[%Y-%m-%d %H:%M:%S.%e] [%l] [thread %t] %v");
+        std::string log_pattern         = config.value("log_pattern", "%s(%#): [%l %D %T.%e %t %!] %v");
         size_t max_file_size            = config.value("max_file_size", 50 * 1024 * 1024);  // 50MB
         size_t max_files                = config.value("max_files", 50);
         size_t log_buffer_size          = config.value("log_bugger_size", 32 * 1024);  // 32Kb
@@ -62,7 +59,7 @@ LoggerImplSpdlog::InitFromConfig(const std::string& config_file) {
         }
 
         // Generate a unique log file name for the same dayS
-        std::string date_str = eurora::utils::TimeUtils::GetCurrentDateString();
+        std::string date_str = eurora::utils::DatetimeProvider::GetCurrentDateString();
 
         int count = 0;
         fs::path unique_log_file;
@@ -94,12 +91,12 @@ LoggerImplSpdlog::InitFromConfig(const std::string& config_file) {
         logger_ = std::make_shared<spdlog::logger>("", sinks.begin(), sinks.end());
         spdlog::set_default_logger(logger_);
 
+        spdlog::info("Logger initialized successfully with configuration from {}", config_file);
+
         // Apply settings
         logger_->set_level(log_level);
         spdlog::set_pattern(log_pattern);
         spdlog::flush_on(flush_level);
-
-        spdlog::info("Logger initialized successfully with configuration from {}", config_file);
     } catch (const std::exception& e) {
         spdlog::error("Failed to initialize logger from config: {}", e.what());
         initialized_ = false;

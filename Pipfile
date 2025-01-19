@@ -3,6 +3,11 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
+[[source]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+verify_ssl = true
+name = "pypitunatsinghuaedu"
+
 [dev-packages]
 requests = "==2.23.0"
 six = "==1.15.0"
@@ -11,6 +16,9 @@ virtualenv = "==20.0.21"
 
 [packages]
 conan = "*"
+cmake = {version = "*", index = "pypitunatsinghuaedu"}
+clang-format = {version = "*", index = "pypitunatsinghuaedu"}
+clang-tidy = {version = "*", index = "pypitunatsinghuaedu"}
 
 [requires]
 python_version = "3.7"

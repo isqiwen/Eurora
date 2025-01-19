@@ -1,11 +1,14 @@
 #pragma once
 
+#include <algorithm>
+#include <cassert>
 #include <functional>
 #include <memory>
 #include <numeric>
 #include <stdexcept>
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <vector>
+
 #include "ndarray.h"
 
 namespace eurora::core {
@@ -13,7 +16,6 @@ namespace eurora::core {
 template <typename T>
 class NDArrayEigen : public NDArray<T> {
 public:
-    using ValueType  = T;
     using TensorType = Eigen::TensorMap<Eigen::Tensor<T, Eigen::Dynamic>>;
 
     NDArrayEigen() = default;
@@ -27,7 +29,7 @@ public:
         dimensions_ = dimensions;
         elements_   = std::accumulate(dimensions.begin(), dimensions.end(), size_t(1), std::multiplies<>());
         AllocateMemory();
-        UpdateTensorMap();
+        UpdateInternalStructures();
     }
 
     void Create(const std::vector<size_t>& dimensions, T* data, bool manage_memory = false) override {
@@ -38,7 +40,7 @@ public:
         elements_      = std::accumulate(dimensions.begin(), dimensions.end(), size_t(1), std::multiplies<>());
         data_          = data;
         manage_memory_ = manage_memory;
-        UpdateTensorMap();
+        UpdateInternalStructures();
     }
 
     void Clear() override {
@@ -47,6 +49,8 @@ public:
         }
         data_ = nullptr;
         dimensions_.clear();
+        offset_factors_.clear();
+        strides_.clear();
         elements_ = 0;
     }
 
@@ -56,12 +60,12 @@ public:
             throw std::runtime_error("Reshape must not change the total number of elements.");
         }
         dimensions_ = dimensions;
-        UpdateTensorMap();
+        UpdateInternalStructures();
     }
 
     void Squeeze() override {
         dimensions_.erase(std::remove(dimensions_.begin(), dimensions_.end(), 1), dimensions_.end());
-        UpdateTensorMap();
+        UpdateInternalStructures();
     }
 
     T& operator()(const std::vector<size_t>& indices) override {
@@ -221,7 +225,7 @@ private:
     void AllocateMemory() override {
         data_          = new T[elements_];
         manage_memory_ = true;
-        UpdateOffsetFactors();
+        UpdateInternalStructures();
     }
 
     void DeallocateMemory() override {
@@ -229,12 +233,10 @@ private:
         data_ = nullptr;
     }
 
-    void UpdateTensorMap() {
-        Eigen::array<Eigen::Index, Eigen::Dynamic> dims(dimensions_.size());
-        for (size_t i = 0; i < dimensions_.size(); ++i) {
-            dims[i] = static_cast<Eigen::Index>(dimensions_[i]);
-        }
-        tensor_ = TensorType(data_, dims);
+    void UpdateInternalStructures() {
+        UpdateOffsetFactors();
+        UpdateTensorMap();
+        strides_ = offset_factors_;
     }
 
     void UpdateOffsetFactors() {
@@ -246,6 +248,15 @@ private:
         }
     }
 
+    void UpdateTensorMap() {
+        Eigen::array<Eigen::Index, Eigen::Dynamic> dims(dimensions_.size());
+        for (size_t i = 0; i < dimensions_.size(); ++i) {
+            dims[i] = static_cast<Eigen::Index>(dimensions_[i]);
+        }
+        tensor_ = TensorType(data_, dims);
+    }
+
+private:
     std::vector<size_t> dimensions_;
     std::vector<size_t> offset_factors_;
     std::vector<size_t> strides_;

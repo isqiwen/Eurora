@@ -1,9 +1,9 @@
 set(LIBRARY_NAME "time")
 
 file(GLOB_RECURSE src_files
-    ${CMAKE_SOURCE_DIR}/src/utils/time/*.h
-    ${CMAKE_SOURCE_DIR}/src/utils/time/*.hpp
-    ${CMAKE_SOURCE_DIR}/src/utils/time/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/export_macros.h
+    ${CMAKE_SOURCE_DIR}/src/utils/time/datetime_provider.h
+    ${CMAKE_SOURCE_DIR}/src/utils/time/datetime_provider.cpp
 )
 
 source_group("src" FILES ${src_files})

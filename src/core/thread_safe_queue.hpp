@@ -3,6 +3,10 @@
 #include <optional>
 #include <queue>
 
+#include "eurora/utils/exception.hpp"
+
+EURORA_DEFINE_EXCEPTION(QueueClosed)
+
 namespace eurora::core {
 template <typename T>
 class ThreadSafeQueue {
@@ -38,19 +42,14 @@ private:
     bool closed_ = false;
 };
 
-class QueueClosed : public std::runtime_error {
-public:
-    QueueClosed() : std::runtime_error("Queue was closed") {};
-};
-
 template <class T>
 T ThreadSafeQueue<T>::PopImpl(std::unique_lock<std::mutex> lock) {
     condition_.wait(lock, [this]() { return !this->queue_.empty() || closed_; });
     if (queue_.empty()) {
         throw QueueClosed();
     }
-    T message = std::move(queue.front());
-    queue_.pop_front();
+    T message = std::move(queue_.front());
+    queue_.pop();
     return message;
 }
 
@@ -60,9 +59,9 @@ void ThreadSafeQueue<T>::Push(T message) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (closed_)
             throw QueueClosed();
-        queue_.emplace_back(std::move(message));
+        queue_.push(std::move(message));
     }
-    cv.notify_one();
+    condition_.notify_one();
 }
 
 template <class T>
@@ -75,12 +74,13 @@ template <class T>
 std::optional<T> ThreadSafeQueue<T>::TryPop() {
     std::unique_lock<std::mutex> lock(mutex_);
     if (queue_.empty()) {
-        std::nullopt;
+        return std::nullopt;
     }
     return PopImpl(std::move(lock));
 }
 
-void ThreadSafeQueue::Close() {
+template <class T>
+void ThreadSafeQueue<T>::Close() {
     {
         std::lock_guard<std::mutex> lock(mutex_);
         closed_ = true;
@@ -88,12 +88,14 @@ void ThreadSafeQueue::Close() {
     condition_.notify_all();
 }
 
-bool ThreadSafeQueue::Empty() const {
+template <class T>
+bool ThreadSafeQueue<T>::Empty() const {
     std::lock_guard<std::mutex> lock(mutex_);
     return queue_.empty();
 }
 
-size_t ThreadSafeQueue::Size() const {
+template <class T>
+size_t ThreadSafeQueue<T>::Size() const {
     std::lock_guard<std::mutex> lock(mutex_);
     return queue_.size();
 }

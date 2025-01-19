@@ -4,7 +4,7 @@
     "source_dir": "src",
     "dist_dir": "dist",
     "compiler": {
-        "cppstd": 17
+        "cppstd": 20
     },
     "build_type": "Release",
     "cmake_generator": "gcc",

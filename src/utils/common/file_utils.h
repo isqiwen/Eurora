@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "eurora/utils/exception.h"
+#include "eurora/utils/exception.hpp"
 
 namespace eurora::utils {
 

@@ -5,7 +5,7 @@
 #include <thread>
 #include <vector>
 
-#include "ThreadSafeQueue.h"
+#include "thread_safe_queue.hpp"
 
 namespace eurora::core {
 class ThreadPool {
@@ -13,15 +13,11 @@ public:
     explicit ThreadPool(size_t num_threads) : stop_(false) {
         for (size_t i = 0; i < num_threads; ++i) {
             workers_.emplace_back([this]() {
-                while (true) {
-                    std::function<void()> task;
-                    if (!tasks_.Pop(task).has_value()) {
-                        if (stop_.load())
-                            break;
-                        continue;
+                try {
+                    while (true) {
+                        tasks_.Pop()();
                     }
-                    task();
-                }
+                } catch (const QueueClosed&) {}
             });
         }
     }
@@ -57,18 +53,6 @@ public:
             for (std::thread& worker : workers_) {
                 if (worker.joinable()) {
                     worker.join();
-                }
-            }
-        }
-    }
-
-    void StopImmediately() {
-        if (!stop_.exchange(true)) {
-            tasks_.Close();
-
-            for (std::thread& worker : workers_) {
-                if (worker.joinable()) {
-                    worker.detach();
                 }
             }
         }

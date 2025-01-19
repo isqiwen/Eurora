@@ -103,7 +103,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Specify the output directory for libraries
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-add_compile_definitions()
-
 # Generate and install project config
 include(cmake/GenerateAndInstallConfig.cmake)

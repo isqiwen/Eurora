@@ -2,6 +2,10 @@
 
 #include <string>
 
+#include "eurora/utils/logger_level.h"
+
+namespace eurora::utils {
+
 class LoggerImpl {
 public:
     virtual ~LoggerImpl() = default;
@@ -18,3 +22,5 @@ public:
 
     virtual void FlushOn(LogLevel lvl) = 0;
 };
+
+}  // namespace eurora::utils

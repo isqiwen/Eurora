@@ -1,4 +1,4 @@
-#include "time_utils.h"
+#include "datetime_provider.h"
 
 #include <chrono>
 #include <iomanip>
@@ -6,7 +6,17 @@
 
 namespace eurora::utils {
 
-std::string TimeUtils::FormatTime(const std::string& format, bool include_ms) {
+std::string DatetimeProvider::GetCurrentDateTimeStringInMS() { return FormatTime("%Y_%m_%d-%H:%M:%S", true); }
+
+std::string DatetimeProvider::GetTimestampString() { return FormatTime("%Y%m%d%H%M%S", false); }
+
+std::string DatetimeProvider::GetTimestampWithMsString() { return FormatTime("%Y%m%d%H%M%S", true); }
+
+std::string DatetimeProvider::GetCurrentDateString() { return FormatTime("%Y-%m-%d", false); }
+
+std::string DatetimeProvider::GetCurrentTimeString(bool enable_ms) { return FormatTime("%H:%M:%S", enable_ms); }
+
+std::string DatetimeProvider::FormatTime(const std::string& format, bool include_ms) {
     auto now             = std::chrono::system_clock::now();
     std::time_t now_time = std::chrono::system_clock::to_time_t(now);
     auto millisec        = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
@@ -20,7 +30,7 @@ std::string TimeUtils::FormatTime(const std::string& format, bool include_ms) {
     return ss.str();
 }
 
-std::tm TimeUtils::GetLocalTime(std::time_t time) {
+std::tm DatetimeProvider::GetLocalTime(std::time_t time) {
     std::tm local_tm;
 #if defined(_WIN32) || defined(_WIN64)
     localtime_s(&local_tm, &time);
@@ -29,15 +39,5 @@ std::tm TimeUtils::GetLocalTime(std::time_t time) {
 #endif
     return local_tm;
 }
-
-std::string TimeUtils::GetCurrentDateTimeStringInMS() { return FormatTime("%Y_%m_%d-%H:%M:%S", true); }
-
-std::string TimeUtils::GetTimestampString() { return FormatTime("%Y%m%d%H%M%S", false); }
-
-std::string TimeUtils::GetTimestampWithMsString() { return FormatTime("%Y%m%d%H%M%S", true); }
-
-std::string TimeUtils::GetCurrentDateString() { return FormatTime("%Y-%m-%d", false); }
-
-std::string TimeUtils::GetCurrentTimeString(bool enable_ms) { return FormatTime("%H:%M:%S", enable_ms); }
 
 }  // namespace eurora::utils

@@ -1,12 +1,10 @@
 #include <gtest/gtest.h>
-#include <chrono>
-#include <thread>
 
-#include "utils/time/time_utils.h"
+#include "utils/time/datetime_provider.h"
 
 using namespace eurora::utils;
 
-class TimeUtilsTest : public ::testing::Test {
+class DatetimeProviderTest : public ::testing::Test {
 protected:
     void SetUp() override {
         // Any setup code if needed
@@ -18,29 +16,29 @@ protected:
 };
 
 // Test: GetCurrentDateTimeStringInMS
-TEST_F(TimeUtilsTest, GetCurrentDateTimeStringInMS) {
-    std::string datetime = TimeUtils::GetCurrentDateTimeStringInMS();
+TEST_F(DatetimeProviderTest, GetCurrentDateTimeStringInMS) {
+    std::string datetime = DatetimeProvider::GetCurrentDateTimeStringInMS();
     ASSERT_FALSE(datetime.empty());
     std::cout << "Current DateTime in MS: " << datetime << std::endl;
 }
 
 // Test: GetTimestampString
-TEST_F(TimeUtilsTest, GetTimestampString) {
-    std::string timestamp = TimeUtils::GetTimestampString();
+TEST_F(DatetimeProviderTest, GetTimestampString) {
+    std::string timestamp = DatetimeProvider::GetTimestampString();
     ASSERT_FALSE(timestamp.empty());
     std::cout << "Timestamp: " << timestamp << std::endl;
 }
 
 // Test: GetTimestampWithMsString
-TEST_F(TimeUtilsTest, GetTimestampWithMsString) {
-    std::string timestamp_with_ms = TimeUtils::GetTimestampWithMsString();
+TEST_F(DatetimeProviderTest, GetTimestampWithMsString) {
+    std::string timestamp_with_ms = DatetimeProvider::GetTimestampWithMsString();
     ASSERT_FALSE(timestamp_with_ms.empty());
     std::cout << "Timestamp with MS: " << timestamp_with_ms << std::endl;
 }
 
 // Test: GetCurrentDateString
-TEST_F(TimeUtilsTest, GetCurrentDateString) {
-    std::string current_date = TimeUtils::GetCurrentDateString();
+TEST_F(DatetimeProviderTest, GetCurrentDateString) {
+    std::string current_date = DatetimeProvider::GetCurrentDateString();
     ASSERT_FALSE(current_date.empty());
     std::cout << "Current Date: " << current_date << std::endl;
 
@@ -51,8 +49,8 @@ TEST_F(TimeUtilsTest, GetCurrentDateString) {
 }
 
 // Test: GetCurrentTimeString
-TEST_F(TimeUtilsTest, GetCurrentTimeString) {
-    std::string current_time = TimeUtils::GetCurrentTimeString();
+TEST_F(DatetimeProviderTest, GetCurrentTimeString) {
+    std::string current_time = DatetimeProvider::GetCurrentTimeString();
     ASSERT_FALSE(current_time.empty());
     std::cout << "Current Time: " << current_time << std::endl;
 
@@ -63,8 +61,8 @@ TEST_F(TimeUtilsTest, GetCurrentTimeString) {
 }
 
 // Test: GetCurrentTimeString with milliseconds
-TEST_F(TimeUtilsTest, GetCurrentTimeStringWithMs) {
-    std::string current_time_with_ms = TimeUtils::GetCurrentTimeString(true);
+TEST_F(DatetimeProviderTest, GetCurrentTimeStringWithMs) {
+    std::string current_time_with_ms = DatetimeProvider::GetCurrentTimeString(true);
     ASSERT_FALSE(current_time_with_ms.empty());
     std::cout << "Current Time with MS: " << current_time_with_ms << std::endl;
 

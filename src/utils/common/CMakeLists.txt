@@ -8,7 +8,7 @@ file(GLOB_RECURSE common_files
 
 file(GLOB_RECURSE exception_files
     ${CMAKE_SOURCE_DIR}/include/eurora/utils/error_codes.h
-    ${CMAKE_SOURCE_DIR}/include/eurora/utils/exception.h
+    ${CMAKE_SOURCE_DIR}/include/eurora/utils/exception.hpp
 )
 
 source_group("Exception" FILES ${exception_files})

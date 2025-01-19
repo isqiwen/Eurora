@@ -3,21 +3,16 @@
 #include <exception>
 #include <sstream>
 #include <string>
-#include <vector>
+#include <filesystem>
 
 #include "eurora/utils/error_codes.h"
 
 namespace eurora::utils {
 
-inline std::string TrimFilePath(const std::string& filePath) {
-    size_t pos = filePath.find_last_of("/\\");
-    return (pos == std::string::npos) ? filePath : filePath.substr(pos + 1);
-}
-
 class Exception : public std::exception {
 public:
     Exception(ErrorCode code, const std::string& description = "", const std::string& file = "", int line = 0)
-        : error_code_(code), description_(description), file_(TrimFilePath(file)), line_(line) {}
+        : error_code_(code), description_(description), file_(std::filesystem::path(file).filename().string()), line_(line) {}
 
     const char* what() const noexcept override {
         if (cached_what_.empty()) {
@@ -46,22 +41,25 @@ private:
     mutable std::string cached_what_;
 };
 
-#define EURORA_THROW_EXCEPTION(code, desc) throw eurora::utils::Exception(code, desc, __FILE__, __LINE__)
+#define EURORA_THROW_ERROR(code, desc) throw eurora::utils::Exception(code, desc, __FILE__, __LINE__)
 
-#define EURORA_THROW_SIMPLE_EXCEPTION(exception_name, desc) throw exception_name(desc, __FILE__, __LINE__)
+#define EURORA_THROW_EXCEPTION(exception_type, desc) throw exception_type(desc, __FILE__, __LINE__)
 
-#define EURORA_MAKE_SIMPLE_EXCEPTION(exception_name)                                                                                              \
+#define EURORA_DEFINE_EXCEPTION(exception_name)                                                                                                   \
     class exception_name : public eurora::utils::Exception {                                                                                      \
     public:                                                                                                                                       \
         exception_name(const std::string& description = "", const std::string& file = __FILE__, int line = __LINE__)                              \
             : eurora::utils::Exception(eurora::utils::ErrorCode::kUnknownError, std::string(#exception_name) + ": " + description, file, line) {} \
     };
 
-#define EURORA_MAKE_SIMPLE_EXCEPTION_WITH_CODE(exception_name, error_code)                                           \
+#define EURORA_DEFINE_EXCEPTION_WITH_CODE(exception_name, error_code)                                                \
     class exception_name : public eurora::utils::Exception {                                                         \
     public:                                                                                                          \
         exception_name(const std::string& description = "", const std::string& file = __FILE__, int line = __LINE__) \
             : eurora::utils::Exception(error_code, std::string(#exception_name) + ": " + description, file, line) {} \
     };
+
+EURORA_DEFINE_EXCEPTION_WITH_CODE(InvalidArgumentException, eurora::utils::ErrorCode::kInvalidArgument)
+EURORA_DEFINE_EXCEPTION_WITH_CODE(FileNotFoundException, eurora::utils::ErrorCode::kIO_FileNotFound)
 
 }  // namespace eurora::utils

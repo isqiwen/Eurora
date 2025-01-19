@@ -31,10 +31,15 @@ class EuroraConan(ConanFile):
     }
 
     requires = [
-        "boost/1.73.0",
+        "boost/1.83.0",
         "spdlog/1.11.0",
         "eigen/3.4.0",
-        "nlohmann_json/3.11.3"
+        "nlohmann_json/3.11.3",
+        "numcpp/2.12.1",
+        "cxxopts/3.1.1",
+        "hdf5/1.14.1",
+        "pugixml/1.13",
+        "fftw/3.3.10"
     ]
 
     tool_requires = [
@@ -57,9 +62,14 @@ class EuroraConan(ConanFile):
 
     def configure(self):
         self.options["boost"].header_only = False
+        self.options["boost"].shared = True
+        self.options["boost"].without_random = False
+        self.options["boost"].without_test = False
+        self.options["boost"].without_system = False
+        self.options["boost"].without_filesystem = False
+        self.options["boost"].without_program_options = False
         # self.options["boost"].without_log = True
         # self.options["boost"].without_math = True
-        # self.options["boost"].without_test = True
         # self.options["boost"].without_wave = True
         # self.options["boost"].without_fiber = True
         # self.options["boost"].without_graph = True
@@ -81,9 +91,6 @@ class EuroraConan(ConanFile):
         # self.options["boost"].without_python = True
         # self.options["boost"].multithreading = False
         # self.options["boost"].type_erasure = False
-        self.options["boost"].without_system = False
-        self.options["boost"].without_filesystem = False
-        self.options["boost"].without_program_options = False
 
     def layout(self):
         cmake_layout(self)

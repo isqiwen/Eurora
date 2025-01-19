@@ -1,17 +1,16 @@
 #pragma once
 
+#include <filesystem>
+#include <format>
 #include <memory>
 #include <sstream>
 #include <string>
 
-#include <fmt/Printf.h>
-
 #include "eurora/utils/export_macros.h"
-#include "utils/pattern/singleton.h"
+#include "eurora/utils/logger_level.h"
+#include "utils/pattern/singleton.hpp"
 
 namespace eurora::utils {
-
-enum class EURORA_API LogLevel { Trace, Debug, Info, Warn, Error, Fatal };
 
 class LoggerImpl;
 
@@ -29,9 +28,8 @@ public:
     void Shutdown();
 
     template <typename... Args>
-    void Logf(const char* file, int line, const char* function, LogLevel level, const char* fmt, Args&&... args) {
-        std::string formatted_message = fmt::format(fmt, std::forward<Args>(args)...);
-        Log(file, line, function, level, formatted_message);
+    void Logf(const char* file, int line, const char* function, LogLevel level, std::format_string<Args...> fmt, Args&&... args) {
+        Log(file, line, function, level, std::format(fmt, std::forward<Args>(args)...));
     }
 
     void Log(const char* file, int line, const char* function, LogLevel level, const std::string& message);
@@ -41,8 +39,6 @@ public:
     LogLevel GetLevel() const;
 
     void FlushOn(LogLevel lvl);
-
-    static const char* GetShortname(std::string_view filepath);
 
 private:
     std::unique_ptr<LoggerImpl> impl_;
@@ -73,9 +69,9 @@ public:
     };
 };
 
-#define __FILENAME__ (eurora::utils::Logger::GetShortname(__FILE__))
+#define __FILENAME__ (std::filesystem::path(__FILE__).filename().string().c_str())
 
-#define LOG(level, fmt, ...) eurora::utils::Logger::Instance().Log(__FILENAME__, __LINE__, __FUNCTION__, level, fmt, ##__VA_ARGS__)
+#define LOG(level, fmt, ...) eurora::utils::Logger::Instance().Logf(__FILENAME__, __LINE__, __FUNCTION__, level, fmt, ##__VA_ARGS__)
 
 #define LOG_TRACE(fmt, ...) LOG(LogLevel::Trace, fmt, ##__VA_ARGS__)
 #define LOG_DEBUG(fmt, ...) LOG(LogLevel::Debug, fmt, ##__VA_ARGS__)

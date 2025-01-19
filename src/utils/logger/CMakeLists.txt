@@ -2,12 +2,16 @@ set(LIBRARY_NAME "logger")
 
 find_package(nlohmann_json REQUIRED)
 find_package(spdlog REQUIRED)
-find_package(fmt REQUIRED)
 
 file(GLOB_RECURSE src_files
+    ${CMAKE_SOURCE_DIR}/src/utils/logger/logger_impl.h
+    ${CMAKE_SOURCE_DIR}/src/utils/logger/logger_impl_spdlog.h
+    ${CMAKE_SOURCE_DIR}/src/utils/logger/logger_impl_spdlog.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/logger/logger.cpp
-    ${CMAKE_SOURCE_DIR}/src/utils/pattern/singleton.h
+    ${CMAKE_SOURCE_DIR}/src/utils/pattern/singleton.hpp
     ${CMAKE_SOURCE_DIR}/include/eurora/utils/logger.h
+    ${CMAKE_SOURCE_DIR}/include/eurora/utils/logger_level.h
+    ${CMAKE_SOURCE_DIR}/include/eurora/utils/export_macros.h
 )
 
 source_group("src" FILES ${src_files})
@@ -16,11 +20,10 @@ add_library(${LIBRARY_NAME} SHARED ${src_files})
 add_library(eurora::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 
 target_link_libraries(${LIBRARY_NAME}
-    PUBLIC
+    PRIVATE
         ProjectOptions
         eurora::time
         spdlog::spdlog_header_only
-        fmt::fmt
         nlohmann_json::nlohmann_json
 )
 

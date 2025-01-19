@@ -1,9 +1,10 @@
 #include "eurora/utils/logger.h"
-#include "logger_impl.h"
+
+#include "logger_impl_spdlog.h"
 
 namespace eurora::utils {
 
-Logger::Logger(Token) : impl_(std::make_unique<LoggerImpl>()) {}
+Logger::Logger(Token) : impl_(std::make_unique<LoggerImplSpdlog>()) {}
 
 Logger::~Logger() { Shutdown(); }
 
@@ -20,13 +21,5 @@ void Logger::FlushOn(LogLevel lvl) { impl_->FlushOn(lvl); }
 void Logger::SetLevel(LogLevel level) { impl_->SetLevel(level); }
 
 LogLevel Logger::GetLevel() const { return impl_->GetLevel(); }
-
-const char* Logger::GetShortname(std::string_view filepath) {
-    if (filepath.empty()) {
-        return filepath.data();
-    }
-
-    return std::filesystem::path(filepath).filename().string().c_str();
-}
 
 }  // namespace eurora::utils
