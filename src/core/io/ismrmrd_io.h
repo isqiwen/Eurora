@@ -7,10 +7,10 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
-#include "Types.h"
 #include "complext.h"
+#include "core/types.h"
 
-namespace Gadgetron::Core::IO {
+namespace eurora::core::io {
 
 // Type mapping from C++ types to ISMRMRD data types
 template <class T>
@@ -84,7 +84,7 @@ void read(std::istream& stream, Image<T>& img);
 template <class T>
 void write(std::ostream& stream, const Image<T>& img);
 
-}  // namespace Gadgetron::Core::IO
+}  // namespace eurora::core::io
 
 #include "primitives.h"
 
