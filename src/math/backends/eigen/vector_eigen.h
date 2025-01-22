@@ -1,10 +1,12 @@
 #pragma once
 
+#include "eurora/utils/export_macros.h"
+
 #include "eurora/math/types.h"
 
 namespace eurora::math {
 
-struct VectorEigenBackend {
+struct EURORA_API VectorEigenBackend {
 
     static fvec Add(const fvec& a, const fvec& b);
 

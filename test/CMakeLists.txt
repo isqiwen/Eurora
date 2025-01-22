@@ -20,6 +20,7 @@ foreach(file ${test_sources})
             PUBLIC
                 eurora::time
                 eurora::logger
+                eurora::math
                 GTest::GTest
                 GTest::Main
         )
@@ -29,6 +30,7 @@ foreach(file ${test_sources})
             PUBLIC
                 eurora::time
                 eurora::logger
+                eurora::math
                 Catch2::Catch2
         )
     else()

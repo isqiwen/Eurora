@@ -28,6 +28,8 @@ print_project_configuration()
 
 add_subdirectory(src)
 
+add_subdirectory(benchmarks)
+
 if(${PROJECT_NAME}_ENABLE_UNIT_TESTING)
     enable_testing()
     add_subdirectory(test)

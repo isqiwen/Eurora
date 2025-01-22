@@ -1,0 +1,2 @@
+add_executable(benchmark_vector_operations benchmark_vector_operations.cpp)
+target_link_libraries(benchmark_vector_operations PRIVATE eurora::math)
