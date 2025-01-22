@@ -45,6 +45,4 @@ using dTensor4D    = Tensor<double>;
 using cx_fTensor4D = Tensor<std::complex<float>>;
 using cx_dTensor4D = Tensor<std::complex<double>>;
 
-enum class BackendType : size_t { MKL = 0, Eigen, Armadillo, NumCpp, Count };
-
 }  // namespace eurora::math

@@ -39,7 +39,8 @@ class EuroraConan(ConanFile):
         "cxxopts/3.1.1",
         "hdf5/1.14.1",
         "pugixml/1.13",
-        "fftw/3.3.10"
+        "fftw/3.3.10",
+        "onetbb/2021.12.0"
     ]
 
     tool_requires = [

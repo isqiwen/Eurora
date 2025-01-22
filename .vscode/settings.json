@@ -49,6 +49,7 @@
     "NDARRAY",
     "NOMINMAX",
     "numcpp",
+    "onetbb",
     "pugixml",
     "RTBS",
     "STREQ",
