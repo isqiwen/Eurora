@@ -17,13 +17,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(cmake/Utils.cmake)
+include(cmake/Tools.cmake)
 include(cmake/StandardSettings.cmake)
 include(cmake/StaticAnalyzers.cmake)
 include(cmake/ProjectOptions.cmake)
-
 include(cmake/ThirdParty/ISMRMRD.cmake)
 
+add_cmake_format_target()
+add_clang_format_target()
 print_project_configuration()
 
 add_subdirectory(src)
