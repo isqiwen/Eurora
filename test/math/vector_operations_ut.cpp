@@ -17,7 +17,7 @@ protected:
 
 // Test Add operation for Eigen backend
 TEST_F(VectorOperationsTest, AddWithEigenBackend) {
-    fvec result = Add<BackendType::Eigen>(vecA, vecB);
+    fvec result = Add<float, BackendType::Eigen>(vecA, vecB);
     EXPECT_FLOAT_EQ(result[0], 5.0f);
     EXPECT_FLOAT_EQ(result[1], 7.0f);
     EXPECT_FLOAT_EQ(result[2], 9.0f);
@@ -25,7 +25,7 @@ TEST_F(VectorOperationsTest, AddWithEigenBackend) {
 
 // Test Subtract operation for Eigen backend
 TEST_F(VectorOperationsTest, SubtractWithEigenBackend) {
-    fvec result = Subtract<BackendType::Eigen>(vecA, vecB);
+    fvec result = Subtract<float, BackendType::Eigen>(vecA, vecB);
     EXPECT_FLOAT_EQ(result[0], -3.0f);
     EXPECT_FLOAT_EQ(result[1], -3.0f);
     EXPECT_FLOAT_EQ(result[2], -3.0f);
@@ -33,7 +33,7 @@ TEST_F(VectorOperationsTest, SubtractWithEigenBackend) {
 
 // Test Add operation for Armadillo backend
 TEST_F(VectorOperationsTest, AddWithArmadilloBackend) {
-    fvec result = Add<BackendType::Armadillo>(vecA, vecB);
+    fvec result = Add<float, BackendType::Armadillo>(vecA, vecB);
     EXPECT_FLOAT_EQ(result[0], 5.0f);
     EXPECT_FLOAT_EQ(result[1], 7.0f);
     EXPECT_FLOAT_EQ(result[2], 9.0f);
@@ -41,7 +41,7 @@ TEST_F(VectorOperationsTest, AddWithArmadilloBackend) {
 
 // Test Subtract operation for Armadillo backend
 TEST_F(VectorOperationsTest, SubtractWithArmadilloBackend) {
-    fvec result = Subtract<BackendType::Armadillo>(vecA, vecB);
+    fvec result = Subtract<float, BackendType::Armadillo>(vecA, vecB);
     EXPECT_FLOAT_EQ(result[0], -3.0f);
     EXPECT_FLOAT_EQ(result[1], -3.0f);
     EXPECT_FLOAT_EQ(result[2], -3.0f);
@@ -49,7 +49,7 @@ TEST_F(VectorOperationsTest, SubtractWithArmadilloBackend) {
 
 // Test Add operation for NumCpp backend
 TEST_F(VectorOperationsTest, AddWithNumCppBackend) {
-    fvec result = Add<BackendType::NumCpp>(vecA, vecB);
+    fvec result = Add<float, BackendType::NumCpp>(vecA, vecB);
     EXPECT_FLOAT_EQ(result[0], 5.0f);
     EXPECT_FLOAT_EQ(result[1], 7.0f);
     EXPECT_FLOAT_EQ(result[2], 9.0f);
@@ -57,7 +57,7 @@ TEST_F(VectorOperationsTest, AddWithNumCppBackend) {
 
 // Test Subtract operation for NumCpp backend
 TEST_F(VectorOperationsTest, SubtractWithNumCppBackend) {
-    fvec result = Subtract<BackendType::NumCpp>(vecA, vecB);
+    fvec result = Subtract<float, BackendType::NumCpp>(vecA, vecB);
     EXPECT_FLOAT_EQ(result[0], -3.0f);
     EXPECT_FLOAT_EQ(result[1], -3.0f);
     EXPECT_FLOAT_EQ(result[2], -3.0f);
@@ -66,11 +66,11 @@ TEST_F(VectorOperationsTest, SubtractWithNumCppBackend) {
 // Test Add with mismatched vector sizes
 TEST_F(VectorOperationsTest, AddWithSizeMismatch) {
     fvec vecC = {1.0f, 2.0f};  // Different size
-    EXPECT_THROW(Add<BackendType::NumCpp>(vecA, vecC), std::invalid_argument);
+    EXPECT_THROW((Add<float, BackendType::NumCpp>(vecA, vecC)), std::invalid_argument);
 }
 
 // Test Subtract with mismatched vector sizes
 TEST_F(VectorOperationsTest, SubtractWithSizeMismatch) {
     fvec vecC = {1.0f, 2.0f};  // Different size
-    EXPECT_THROW(Subtract<BackendType::NumCpp>(vecA, vecC), std::invalid_argument);
+    EXPECT_THROW((Subtract<float, BackendType::NumCpp>(vecA, vecC)), std::invalid_argument);
 }

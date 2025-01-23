@@ -9,7 +9,7 @@
 namespace chrono = std::chrono;
 using namespace eurora::math;
 
-fvec generate_random_vector(size_t size) {
+fvec GenerateRandomVector(size_t size) {
     fvec vec(1, size);
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -22,17 +22,17 @@ fvec generate_random_vector(size_t size) {
 }
 
 template <BackendType backend>
-void test_performance(const std::string& operation, size_t vector_size, int iterations) {
-    fvec vec1 = generate_random_vector(vector_size);
-    fvec vec2 = generate_random_vector(vector_size);
+void TestPerformance(const std::string& operation, size_t vector_size, int iterations) {
+    fvec vec1 = GenerateRandomVector(vector_size);
+    fvec vec2 = GenerateRandomVector(vector_size);
 
     auto start = chrono::high_resolution_clock::now();
 
     for (int i = 0; i < iterations; ++i) {
         if (operation == "Add") {
-            Add<backend>(vec1, vec2);
+            Add<float, backend>(vec1, vec2);
         } else if (operation == "Subtract") {
-            Subtract<backend>(vec1, vec2);
+            Subtract<float, backend>(vec1, vec2);
         }
     }
 
@@ -48,13 +48,13 @@ int main() {
     const int iterations                   = 100;
 
     for (size_t size : vector_sizes) {
-        test_performance<BackendType::NumCpp>("Add", size, iterations);
-        test_performance<BackendType::Eigen>("Add", size, iterations);
-        test_performance<BackendType::Armadillo>("Add", size, iterations);
+        TestPerformance<BackendType::NumCpp>("Add", size, iterations);
+        TestPerformance<BackendType::Eigen>("Add", size, iterations);
+        TestPerformance<BackendType::Armadillo>("Add", size, iterations);
 
-        test_performance<BackendType::NumCpp>("Subtract", size, iterations);
-        test_performance<BackendType::Eigen>("Subtract", size, iterations);
-        test_performance<BackendType::Armadillo>("Subtract", size, iterations);
+        TestPerformance<BackendType::NumCpp>("Subtract", size, iterations);
+        TestPerformance<BackendType::Eigen>("Subtract", size, iterations);
+        TestPerformance<BackendType::Armadillo>("Subtract", size, iterations);
 
         std::cout << std::endl;
     }

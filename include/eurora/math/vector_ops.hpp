@@ -3,9 +3,9 @@
 #include "eurora/math/backend_type.h"
 #include "eurora/math/types.h"
 
-#include "math/backends/armadillo/vector_armadillo.h"
-#include "math/backends/eigen/vector_eigen.h"
-#include "math/backends/numcpp/vector_numcpp.h"
+#include "eurora/math/backends/vector_armadillo.hpp"
+#include "eurora/math/backends/vector_eigen.hpp"
+#include "eurora/math/backends/vector_numcpp.hpp"
 
 namespace eurora::math {
 
@@ -14,60 +14,62 @@ struct VectorBackendMapping;
 
 template <>
 struct VectorBackendMapping<BackendType::Eigen> {
-    using Type = VectorEigenBackend;
+    template <typename T>
+    using Type = VectorEigenBackend<T>;
 };
 
 template <>
 struct VectorBackendMapping<BackendType::Armadillo> {
-    using Type = VectorArmadilloBackend;
+    template <typename T>
+    using Type = VectorArmadilloBackend<T>;
 };
 
 template <>
 struct VectorBackendMapping<BackendType::NumCpp> {
-    using Type = VectorNumCppBackend;
+    template <typename T>
+    using Type = VectorNumCppBackend<T>;
 };
 
-template <typename Backend>
-concept AddValidBackend = requires(const fvec& a, const fvec& b) {
-    { Backend::Add(a, b) } -> std::same_as<fvec>;
+template <typename T, BackendType backendType>
+concept AddValidBackend = requires(const Vector<T>& a, const Vector<T>& b) {
+    { VectorBackendMapping<backendType>::template Type<T>::Add(a, b) } -> std::same_as<Vector<T>>;
 };
 
-template <typename Backend>
-concept SubtractValidBackend = requires(const fvec& a, const fvec& b) {
-    { Backend::Subtract(a, b) } -> std::same_as<fvec>;
+template <typename T, BackendType backendType>
+concept SubtractValidBackend = requires(const Vector<T>& a, const Vector<T>& b) {
+    { VectorBackendMapping<backendType>::template Type<T>::Subtract(a, b) } -> std::same_as<Vector<T>>;
 };
 
 struct VectorOperations {
-
-    template <BackendType backendType>
-    static fvec Add(const fvec& a, const fvec& b) requires AddValidBackend<typename VectorBackendMapping<backendType>::Type> {
-        using VectorBackend = typename VectorBackendMapping<backendType>::Type;
-        return VectorBackend::Add(a, b);
+    template <typename T, BackendType backendType>
+    static Vector<T> Add(const Vector<T>& a, const Vector<T>& b) requires AddValidBackend<T, backendType> {
+        using Backend = typename VectorBackendMapping<backendType>::template Type<T>;
+        return Backend::Add(a, b);
     }
 
-    template <BackendType backendType>
-    static fvec Subtract(const fvec& a, const fvec& b) requires SubtractValidBackend<typename VectorBackendMapping<backendType>::Type> {
-        using VectorBackend = typename VectorBackendMapping<backendType>::Type;
-        return VectorBackend::Subtract(a, b);
+    template <typename T, BackendType backendType>
+    static Vector<T> Subtract(const Vector<T>& a, const Vector<T>& b) requires SubtractValidBackend<T, backendType> {
+        using Backend = typename VectorBackendMapping<backendType>::template Type<T>;
+        return Backend::Subtract(a, b);
     }
 };
 
-template <BackendType Blackend = BackendType::NumCpp>
-fvec Add(const fvec& a, const fvec& b) {
+template <typename T, BackendType backendType = BackendType::NumCpp>
+Vector<T> Add(const Vector<T>& a, const Vector<T>& b) {
     if (a.size() != b.size()) {
         throw std::invalid_argument("Vectors must have the same size for add.");
     }
 
-    return VectorOperations::Add<Blackend>(a, b);
+    return VectorOperations::Add<T, backendType>(a, b);
 }
 
-template <BackendType Blackend = BackendType::NumCpp>
-fvec Subtract(const fvec& a, const fvec& b) {
+template <typename T, BackendType backendType = BackendType::NumCpp>
+Vector<T> Subtract(const Vector<T>& a, const Vector<T>& b) {
     if (a.size() != b.size()) {
         throw std::invalid_argument("Vectors must have the same size for subtraction.");
     }
 
-    return VectorOperations::Subtract<Blackend>(a, b);
+    return VectorOperations::Subtract<T, backendType>(a, b);
 }
 
 }  // namespace eurora::math

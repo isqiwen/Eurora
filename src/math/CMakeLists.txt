@@ -28,10 +28,6 @@ target_link_libraries(${LIBRARY_NAME}
     PUBLIC
         ProjectOptions
         NumCpp::NumCpp
-)
-
-target_link_libraries(${LIBRARY_NAME}
-    PRIVATE
         Eigen3::Eigen
         armadillo::armadillo
 )
