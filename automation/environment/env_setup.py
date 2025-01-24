@@ -11,6 +11,8 @@ from automation.buildkit.conan_setup import conan_setup
 from automation.environment.generate_env import generate_env_file
 from automation.environment.venv_helper import (
     get_python_info,
+    check_pipenv,
+    install_pipenv,
     get_pipenv_venv,
     delete_virtualenv,
     create_virtualenv,
@@ -46,6 +48,10 @@ def setup_python_env(env_root, pypi_source="https://pypi.tuna.tsinghua.edu.cn/si
     try:
         # Check Python version
         python_version, _ = get_python_info()
+        pipenv_exist, _ = check_pipenv()
+        if not pipenv_exist:
+            install_pipenv(pypi_source)
+
         venv_exist, venv_path = get_pipenv_venv()
 
         if venv_exist:

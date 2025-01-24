@@ -1,5 +1,8 @@
 #pragma once
 
+#define EIGEN_USE_MKL_ALL
+#define EIGEN_USE_MKL_VML
+
 #include <Eigen/Dense>
 
 #include "eurora/math/types.h"

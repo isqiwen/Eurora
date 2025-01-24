@@ -51,10 +51,12 @@ int main() {
         TestPerformance<BackendType::NumCpp>("Add", size, iterations);
         TestPerformance<BackendType::Eigen>("Add", size, iterations);
         TestPerformance<BackendType::Armadillo>("Add", size, iterations);
+        TestPerformance<BackendType::MKL>("Add", size, iterations);
 
         TestPerformance<BackendType::NumCpp>("Subtract", size, iterations);
         TestPerformance<BackendType::Eigen>("Subtract", size, iterations);
         TestPerformance<BackendType::Armadillo>("Subtract", size, iterations);
+        TestPerformance<BackendType::MKL>("Subtract", size, iterations);
 
         std::cout << std::endl;
     }

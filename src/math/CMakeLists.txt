@@ -3,6 +3,7 @@ set(LIBRARY_NAME "math")
 find_package(Eigen3 REQUIRED)
 find_package(NumCpp REQUIRED)
 find_package(Armadillo REQUIRED)
+find_package(MKL REQUIRED)
 
 file(GLOB_RECURSE src_files
     ${CMAKE_SOURCE_DIR}/src/math/backends/armadillo/vector_armadillo.h
@@ -27,6 +28,7 @@ add_library(eurora::${LIBRARY_NAME} ALIAS ${LIBRARY_NAME})
 target_link_libraries(${LIBRARY_NAME}
     PUBLIC
         ProjectOptions
+        MKL::MKL
         NumCpp::NumCpp
         Eigen3::Eigen
         armadillo::armadillo

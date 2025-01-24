@@ -4,13 +4,22 @@
 #include "eurora/math/types.h"
 
 #include "eurora/math/backends/vector_armadillo.hpp"
+#define _MKL_LAPACK_H_
+#include "mkl.h"
 #include "eurora/math/backends/vector_eigen.hpp"
 #include "eurora/math/backends/vector_numcpp.hpp"
+#include "eurora/math/backends/vector_mkl.hpp"
 
 namespace eurora::math {
 
 template <BackendType backendType>
 struct VectorBackendMapping;
+
+template <>
+struct VectorBackendMapping<BackendType::MKL> {
+    template <typename T>
+    using Type = VectorMKLBackend<T>;
+};
 
 template <>
 struct VectorBackendMapping<BackendType::Eigen> {

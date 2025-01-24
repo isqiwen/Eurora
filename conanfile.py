@@ -45,7 +45,7 @@ class EuroraConan(ConanFile):
     ]
 
     tool_requires = [
-        "doxygen/1.12.0",
+        # "doxygen/1.12.0",
         "cmake/[>=3.27.0]",
         "ccache/[>=4.8.3]",
         "cppcheck/[>=2.12.1]"

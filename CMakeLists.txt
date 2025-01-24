@@ -22,6 +22,7 @@ include(cmake/StandardSettings.cmake)
 include(cmake/StaticAnalyzers.cmake)
 include(cmake/ProjectOptions.cmake)
 include(cmake/ThirdParty/ISMRMRD.cmake)
+include(cmake/ThirdParty/FindMKL.cmake)
 
 add_cmake_format_target()
 add_clang_format_target()

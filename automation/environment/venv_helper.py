@@ -107,9 +107,14 @@ def check_pipenv():
     success, venv_path, _ = run_command(["pipenv", "--version"], check=False)
 
     if not success:
-        raise EnvironmentSetupError("Pipenv doesn't exist!")
+        Logger.Error("Pipenv doesn't exist!")
+        return False, ""
 
     return success, venv_path
+
+def install_pipenv(pypi_source):
+    Logger.Info("Installing pipenv...")
+    run_command(["python", "-m", "pip", "install", "pipenv", "-i", pypi_source])
 
 def activate_pipenv_env():
     """
@@ -161,7 +166,7 @@ def create_virtualenv(python_version, pypi_source):
     Logger.Info("Installing clang-tidy in virtualenv...")
     run_command(["pipenv", "install", "clang-tidy", "-i", pypi_source], env=env)
 
-def run_pipenv_python_command(command : str | list, *, check=True):
+def run_pipenv_python_command(command, *, check=True):
     env = os.environ.copy()
     env["PIPENV_VENV_IN_PROJECT"] = "TRUE"
     env["PIPENV_MAX_DEPTH"] = "10"

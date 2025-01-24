@@ -104,7 +104,10 @@ async def run_command_async(command, *, check=False, env=None, log_each_line=Tru
     if isinstance(command, str):
         command = command.split()
     elif not isinstance(command, list):
-        raise ValueError("Command must be a string or a list.")
+        if check:
+            raise ValueError("Command must be a string or a list.")
+        else:
+            return False, "", "Command must be a string or a list."
 
     Logger.Info(f'Shell: executing shell command : {command}')
 
@@ -123,7 +126,10 @@ async def run_command_async(command, *, check=False, env=None, log_each_line=Tru
         )
     except Exception as e:
         Logger.Error(f"Failed to start process: {e}")
-        raise
+        if check:
+            raise
+        else:
+            return False, "", f"Failed to start process: {e}"
 
     stdout_buffer = StringBuffer()
     stderr_buffer = StringBuffer()
@@ -157,7 +163,10 @@ async def run_command_async(command, *, check=False, env=None, log_each_line=Tru
             return process.returncode == 0, stdout, stderr
     except Exception as e:
         Logger.Error(f"Error while running command: {e}")
-        raise
+        if check:
+            raise
+        else:
+            return False, "", f"Error while running command: {e}"
 
 
 def run_command(*args, **kwargs):
